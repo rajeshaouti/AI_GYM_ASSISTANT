@@ -45,7 +45,8 @@ Fig 1: Screen shot of the Real Time pose capture for a squat exercise.
 
 The 3D reconstructed image is obtained by triangulation method using two 
 cameras.
-![Screenshot (14)](https://user-images.githubusercontent.com/26201695/152658986-f16adb79-7a92-4a2a-88d5-8a9695111d09.png)
+
+![Screenshot (14)](https://user-images.githubusercontent.com/26201695/152659129-f4f12ee5-ace9-4d9a-b8c8-aaf00bb93b80.png)
 
 Fig 2: Screen shot of the Real Time 3D reconstruction of the human model performing a 
 barbell squat.
