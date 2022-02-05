@@ -1,3 +1,4 @@
+# Single Camera Capture
 
 This program runs a single camera to analyze the side view of the human for Barbell sqaut performance tracking.
 
