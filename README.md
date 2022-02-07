@@ -51,6 +51,14 @@ cameras.
 Fig 2: Screen shot of the Real Time 3D reconstruction of the human model performing a 
 barbell squat.
 
+# Requirement
+```
+Mediapipe
+Python3.8
+Opencv
+matplotlib
+```
+
 ## Future work 
 • The feedback given to the user is now in the visual domain. We want to 
 achieve the feedback as an audio and haptic feedback.
