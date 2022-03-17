@@ -126,4 +126,6 @@ def plot_ArucoMarkers(arucofound,img):
     return bounding_box
 
 def graph_plot():
-    os.system("Squats_version_1_plotting.py")
+    path = os.path.abspath("Squats_version_1_plotting.py")
+    print(path)
+    os.system('"'+path+'"')

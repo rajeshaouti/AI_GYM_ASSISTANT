@@ -2,13 +2,31 @@
 
 This program runs a single camera to analyze the side view of the human for Barbell sqaut performance tracking.
 
+Instructions to run
 
 ```
-Run the Squats_Version_1.py making sure that the camera index is matching with that of your camera.
+pip install opencv-python
+pip install opencv-contrib-python
+pip install mediapipe
+```
+
+You can disable AruCo marker tracking at by setting
 
 ```
-This program runs a two camera to capture both the side view and front view of the human for Barbell sqaut performance tracking.
+TRACK_ARUCO = False
+```
+
+After making sure that the camera index is matching with that of your camera. Run:
+
+```
+python Squats_Version_1.py
+```
+
+**Press Q to exit the program.**
+
+This program runs a single camera to capture the side view human for Barbell sqaut performance tracking.
 Aruco marker of dimension 6X6 is used for barbell tracking.The link for generating the aruco marker is,
+
 ```
 https://chev.me/arucogen/
 ```
