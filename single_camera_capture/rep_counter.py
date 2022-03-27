@@ -9,8 +9,10 @@ import _thread
 import csv
 import os
 from itertools import count
+import numpy as np
+import json
 
-from aigym import *
+import aigym
 
 ## AruCo Tracking
 TRACK_ARUCO = False
@@ -27,7 +29,20 @@ direction = 0
 count = 0
 point_no = []
 
-# Openpose module
+EXERCISE = "squats.json"
+
+landmarkID = json.loads(open("mediapipe_landmarks.json").read())
+exercise = json.loads(open(EXERCISE).read())
+measurements = {}
+
+
+print("LOADING EXERCISE: "+exercise["name"])
+print("VERSION: "+exercise["version"])
+for measurement in exercise["measurements"]:
+    measurement
+
+
+# mediapipe module
 mpDraw = mp.solutions.drawing_utils
 mpPose = mp.solutions.pose
 pose = mpPose.Pose()
@@ -38,8 +53,8 @@ tracker = cv2.TrackerCSRT_create()
 # Capture the video feed
 cap = cv2.VideoCapture(0)
 
-# Run the code for plotting
-_thread.start_new_thread(graph_plot, ())
+# Run the code for plotting aruco
+_thread.start_new_thread(aigym.graph_plot, ())
 
 # Creating a CSV file
 num_coord = 33
@@ -60,10 +75,10 @@ if TRACK_ARUCO:
 
     while initial_run_count > 0:
         ok, img = cap.read()
-        arucofound = findArucoMarkers(img)
+        arucofound = aigym.findArucoMarkers(img)
 
         if len(arucofound[0]) != 0:
-            bounding_box = plot_ArucoMarkers(arucofound, img)
+            bounding_box = aigym.plot_ArucoMarkers(arucofound, img)
             initial_run_count -= 1
 
         cv2.imshow("Tracking", img)
@@ -88,10 +103,10 @@ while cap.isOpened():
 
     #ARUCO MARKER
     if TRACK_ARUCO:
-        arucofound = findArucoMarkers(img,draw=False)
+        arucofound = aigym.findArucoMarkers(img,draw=False)
 
         if len(arucofound[0]) != 0:
-            bounding_box = plot_ArucoMarkers(arucofound, img)
+            bounding_box = aigym.plot_ArucoMarkers(arucofound, img)
         else:
             try:
                 ok, bounding_box = tracker.update(img)
@@ -127,16 +142,16 @@ while cap.isOpened():
     #detecting only if pose landmarks are present
     if results.pose_landmarks:
         h, w, c = img.shape
-        lmlist = []
+        landmark_list = []
         for id, lm in enumerate(results.pose_landmarks.landmark):
             cx, cy = int(lm.x * w), int(lm.y * h)
-            lmlist.append([id, cx, cy])
+            landmark_list.append([id, cx, cy])
 
-        if len(lmlist) != 0:
+        if len(landmark_list) != 0:
 
             # Calculate angle back
-            point_back = findpositions(11, 23, 25, lmlist)
-            angle_back = calculate_angle(point_back)
+            point_back = aigym.findpositions(landmarkID["left_shoulder"], landmarkID["left_hip"], landmarkID["left_knee"], landmark_list)
+            angle_back = aigym.calculate_angle(point_back)
 
             if angle_back < 125:  # EXPERT ADVICE
                 color_back = color_green
@@ -149,25 +164,23 @@ while cap.isOpened():
                         cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
             cv2.rectangle(img, (600, 25), (625, 50), color_back, cv2.FILLED)
 
-            plot1 = plot(point_back, color_back, angle_back, img)
+            plot1 = aigym.plot(point_back, color_back, angle_back, img)
 
 
             # Calculate knee angle ,knee position ,toe position
-            point_knee = findpositions(23, 25, 27, lmlist)
-            angle_knee = calculate_angle(point_knee)
-            knee_position = point_knee[1][0]
-
-            point_toe = findpositions(25, 27, 31, lmlist)
-            angle_toe = calculate_angle(point_toe)
-            toe_position = point_knee[2][0]
+            point_knee = aigym.findpositions(landmarkID["left_hip"], landmarkID["left_knee"], landmarkID["left_ankle"], landmark_list)
+            angle_knee = aigym.calculate_angle(point_knee)
+            knee_position = aigym.find_point_position(landmarkID["left_knee"], landmark_list)
+            knee_position_x = knee_position[0]
+            toe_position_x = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)[0]
 
 
             # Calculating knee overflow through foot distance
-            ankle = find_point_position(27, lmlist)
-            toe = find_point_position(31, lmlist)
+            ankle = aigym.find_point_position(landmarkID["left_ankle"], landmark_list)
+            toe = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)
             foot_length = int(math.sqrt((ankle[0] - toe[0]) ** 2 + (ankle[1] - toe[1]) ** 2))
 
-            distance_knee_toe = abs(knee_position - toe_position)
+            distance_knee_toe = abs(knee_position_x - toe_position_x)
 
 
             # Updating KNEE indicators
@@ -183,12 +196,11 @@ while cap.isOpened():
             cv2.putText(img, str('Knee'), (550, 90),
                         cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
             cv2.rectangle(img, (600, 75), (625, 100), color_knee, cv2.FILLED)
-            plot2 = plot(point_knee, color_knee, abs(knee_position - toe_position), img)
+            plot2 = aigym.plot(point_knee, color_knee, abs(knee_position_x - toe_position_x), img)
 
-            centroid_thigh = findcentroid(23, 25, lmlist)
+            centroid_thigh = aigym.findcentroid(landmarkID["left_hip"], landmarkID["left_knee"], landmark_list)
 
-            ear_position = find_point_position(7, lmlist)
-            toe_position = find_point_position(31, lmlist)
+            ear_position = aigym.find_point_position(landmarkID["left_ear"], landmark_list)
 
             distance_H = (ear_position[0] - centroid_thigh[0])
             distance = abs(centroid_thigh[0] - ear_position[0])
@@ -200,28 +212,28 @@ while cap.isOpened():
             #Update HEAD-THIGH indicator
             if distance <= thigh_half_length:  # EXPERT ADVICE
                 color_Head_thigh = color_green
-                plot_point(centroid_thigh, color_Head_thigh, img)
-                plot_point(ear_position, color_Head_thigh, img)
+                aigym.plot_point(centroid_thigh, color_Head_thigh, img)
+                aigym.plot_point(ear_position, color_Head_thigh, img)
             elif distance <= 1.3 * thigh_half_length:  # EXPERT ADVICE
                 color_Head_thigh = color_yellow
-                plot_point(centroid_thigh, color_Head_thigh, img)
-                plot_point(ear_position, color_Head_thigh, img)
+                aigym.plot_point(centroid_thigh, color_Head_thigh, img)
+                aigym.plot_point(ear_position, color_Head_thigh, img)
             else:
                 color_Head_thigh = color_red
-                plot_point(centroid_thigh, color_Head_thigh, img)
-                plot_point(ear_position, color_Head_thigh, img)
+                aigym.plot_point(centroid_thigh, color_Head_thigh, img)
+                aigym.plot_point(ear_position, color_Head_thigh, img)
 
             cv2.putText(img, str('Head-Thigh'), (500, 140),
                         cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
             cv2.rectangle(img, (600, 125), (625, 150), color_Head_thigh, cv2.FILLED)
 
             # Drawing a Bounding box
-            toe_1_position = find_point_position(29, lmlist)
-            toe_2_position = find_point_position(31, lmlist)
-            toe_3_position = find_point_position(30, lmlist)
-            toe_4_position = find_point_position(32, lmlist)
-            hip_position_1 = find_point_position(23, lmlist)
-            hip_position_2 = find_point_position(24, lmlist)
+            toe_1_position = aigym.find_point_position(landmarkID["left_heel"], landmark_list)
+            toe_2_position = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)
+            toe_3_position = aigym.find_point_position(landmarkID["right_heel"], landmark_list)
+            toe_4_position = aigym.find_point_position(landmarkID["right_foot_index"], landmark_list)
+            hip_position_1 = aigym.find_point_position(landmarkID["left_hip"], landmark_list)
+            hip_position_2 = aigym.find_point_position(landmarkID["right_hip"], landmark_list)
 
             if toe_1_position > toe_2_position:  # left view
                 rect_point_1 = int(toe_1_position[0] * 1.15), toe_1_position[1]
@@ -236,11 +248,11 @@ while cap.isOpened():
                 # distance_hip_and_bounding_box = (hip_position_2[0] - rect_point_4[0])
                 cv2.rectangle(img, rect_point_1, rect_point_4, color_Head_thigh, 2, cv2.LINE_AA)
 
-            plot_horizontal_column = plot_bar_horizontal(distance_H, img, thigh_half_length, color_Head_thigh)
+            plot_horizontal_column = aigym.plot_bar_horizontal(distance_H, img, thigh_half_length, color_Head_thigh)
 
 
             ## Updating the FINAL count of the reps
-            plot4 = plot_bar(angle_knee, (5, 110), img)  #  Expert Advice  - Angle limits
+            plot4 = aigym.plot_bar(angle_knee, (5, 110), img)  #  Expert Advice  - Angle limits
             color_list = [color_knee, color_Head_thigh, color_back]
             if plot4[0] == 100:
                 if direction == 0:

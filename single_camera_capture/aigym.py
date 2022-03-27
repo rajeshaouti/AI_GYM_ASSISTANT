@@ -12,23 +12,23 @@ def calculate_angle(a):
     return round(angle)
 
 
-def find_point_position(id,lmlist):
-    point = (lmlist[id][1], lmlist[id][2])
+def find_point_position(id,landmark_list):
+    point = (landmark_list[id][1], landmark_list[id][2])
     return point
 
 
-def findpositions(id1, id2, id3,lmlist):
-    point1 = (lmlist[id1][1], lmlist[id1][2])
-    point2 = (lmlist[id2][1], lmlist[id2][2])
-    point3 = (lmlist[id3][1], lmlist[id3][2])
+def findpositions(id1, id2, id3,landmark_list):
+    point1 = (landmark_list[id1][1], landmark_list[id1][2])
+    point2 = (landmark_list[id2][1], landmark_list[id2][2])
+    point3 = (landmark_list[id3][1], landmark_list[id3][2])
     return point1, point2, point3
 
 
-def findcentroid(id1, id2,lmlist):
-    point1 = (lmlist[id1][1], lmlist[id1][2])
-    point2 = (lmlist[id2][1], lmlist[id2][2])
-    centroid_x = int((lmlist[id1][1] + lmlist[id2][1]) / 2)
-    centroid_y = int((lmlist[id1][2] + lmlist[id2][2]) / 2)
+def findcentroid(id1, id2,landmark_list):
+    point1 = (landmark_list[id1][1], landmark_list[id1][2])
+    point2 = (landmark_list[id2][1], landmark_list[id2][2])
+    centroid_x = int((landmark_list[id1][1] + landmark_list[id2][1]) / 2)
+    centroid_y = int((landmark_list[id1][2] + landmark_list[id2][2]) / 2)
     centroid = (centroid_x, centroid_y)
     return centroid
 
@@ -125,7 +125,27 @@ def plot_ArucoMarkers(arucofound,img):
 
     return bounding_box
 
+def euclidean_distance(point1,point2,round=True):
+    point1 = np.array(point1)
+    point2 = np.array(point2)
+    distance = np.linalg.norm(point1-point2)
+    if round:
+        return int(distance)
+    else:
+        return distance
+
+def absolute_distance(point1,point2,axis,round=False):
+    point1 = np.array(point1)
+    point2 = np.array(point2)
+    distance = abs(point1[axis] - point2[axis])
+    if round:
+        return int(distance)
+    else:
+        return distance
+
+
 def graph_plot():
     path = os.path.abspath("Squats_version_1_plotting.py")
     print(path)
     os.system('"'+path+'"')
+

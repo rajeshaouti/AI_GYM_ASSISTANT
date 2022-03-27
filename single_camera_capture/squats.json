@@ -1,0 +1,50 @@
+{
+    "name": "Squats",
+    "version": "1.0",
+    "measurements": [
+        {
+            "name": "foot_length",
+            "type": "distance",
+            "points": [
+                "left_ankle",
+                "left_foot_index"
+            ]
+        },
+        {}
+    ],
+    "indicators": [
+        {
+            "name": "angle_back",
+            "type": "angle",
+            "good": {
+                "min": 0,
+                "max": 125
+            },
+            "intermediate": {
+                "min": 120,
+                "max": 135
+            },
+            "bad": {
+                "min": 135,
+                "max": 360,
+                "warning": "Back angle too high"
+            }
+        },
+        {
+            "name": "distance_knee_toe_to_",
+            "type": "distance",
+            "good": {
+                "min": 0,
+                "max": 125
+            },
+            "intermediate": {
+                "min": 120,
+                "max": 135
+            },
+            "bad": {
+                "min": 135,
+                "max": 360
+            }
+        }
+    ]
+}
