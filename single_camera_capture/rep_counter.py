@@ -156,13 +156,32 @@ while cap.isOpened():
             #PREPROCESSING MEASUREMENTS
             for measurement in exercise["measurements"]:
                 if measurement["type"] == "euclidean":
-                    measurements[measurement["name"]] = aigym.euclidean_distance(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]])
+                    # print(measurement["name"])
+                    # print(landmarkID)
+                    # print(landmarkID[measurement["points"][0]])
+                    # print(landmarkID[measurement["points"][1]])
+                    point1 = landmarkID[measurement["points"][0]]
+                    point2 = landmarkID[measurement["points"][1]]
+                    if type(point1) == int:
+                        point1 = aigym.find_point_position(point1,landmark_list)
+                    if type(point2) == int:
+                        point2 = aigym.find_point_position(point2,landmark_list)
+
+
+                    measurements[measurement["name"]] = aigym.euclidean_distance(point1, point2)
+                    # print(aigym.euclidean_distance(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]]))
                 elif measurement["type"] == "multiply":
                     measurements[measurement["name"]] = measurements[measurement["initial"]]*measurement["value"]
                 elif measurement["type"] == "centroid":
                     landmarkID[measurement["name"]] = aigym.findcentroid(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]], landmark_list)
                 elif measurement["type"] == "absolute":
-                    measurements[measurement["name"]] = aigym.absolute_distance(aigym.find_point_position(landmarkID[measurement["points"][0]],landmark_list), aigym.find_point_position(landmarkID[measurement["points"][1]], landmark_list),axis = measurement["axis"])
+                    point1 = landmarkID[measurement["points"][0]]
+                    point2 = landmarkID[measurement["points"][1]]
+                    if type(point1) == int:
+                        point1 = aigym.find_point_position(point1,landmark_list)
+                    if type(point2) == int:
+                        point2 = aigym.find_point_position(point2,landmark_list)
+                    measurements[measurement["name"]] = aigym.absolute_distance(point1, point2 ,axis = measurement["axis"])
 
             #UPDATING INDICATORS
             for indicator_index in range(numberOfIndicators):
@@ -172,11 +191,11 @@ while cap.isOpened():
                     angle = aigym.calculate_angle(point)
                     status = -1
                     if status == -1 and ("good" in indicator):
-                        if angle <indicator["good"].get("max",inf) and angle > indicator["good"].get("min",-inf):
+                        if angle <=indicator["good"].get("max",inf) and angle >= indicator["good"].get("min",-inf):
                             status = 0
                     
                     if status == -1 and ("intermediate" in indicator):
-                        if angle <indicator["intermediate"].get("max",inf) and angle > indicator["intermediate"].get("min",-inf):
+                        if angle <=indicator["intermediate"].get("max",inf) and angle >= indicator["intermediate"].get("min",-inf):
                             status = 1
                     
                     if status == -1:
@@ -188,11 +207,11 @@ while cap.isOpened():
                     attribute = measurements[indicator["name"]]
                     status = -1
                     if status == -1 and ("good" in indicator):
-                        if attribute <measurements[indicator["good"].get("max","inf")] and attribute > measurements[indicator["good"].get("min","-inf")]:
+                        if attribute <=measurements[indicator["good"].get("max","inf")] and attribute >= measurements[indicator["good"].get("min","-inf")]:
                             status = 0
                     
                     if status == -1 and ("intermediate" in indicator):
-                        if attribute <measurements[indicator["intermediate"].get("max","inf")] and attribute > measurements[indicator["intermediate"].get("min","-inf")]:
+                        if attribute <=measurements[indicator["intermediate"].get("max","inf")] and attribute >= measurements[indicator["intermediate"].get("min","-inf")]:
                             status = 1
                     
                     if status == -1:
@@ -207,11 +226,12 @@ while cap.isOpened():
                 angle = aigym.calculate_angle(point)
                 if angle <sequence.get("max",inf) and angle > sequence.get("min",-inf):
                     present_sequence = (present_sequence+1)%total_sequences_length
-                    rep_count+=1
+                    rep_count+=0.5
                     if 2 not in indicator_status:
-                        good_rep_count+=1
+                        good_rep_count+=0.5
             
-            print("rep_counter",rep_count,good_rep_count)
+            print("rep_count",rep_count,"good_rep_count",good_rep_count,indicator_status,angle,present_sequence)
+            # print(measurements)
 
             # Calculate angle back
             point_back = aigym.findpositions(landmarkID["left_shoulder"], landmarkID["left_hip"], landmarkID["left_knee"], landmark_list)
@@ -243,6 +263,7 @@ while cap.isOpened():
             ankle = aigym.find_point_position(landmarkID["left_ankle"], landmark_list)
             toe = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)
             foot_length = int(math.sqrt((ankle[0] - toe[0]) ** 2 + (ankle[1] - toe[1]) ** 2))
+            foot_length1 = aigym.euclidean_distance(ankle, toe)
 
             distance_knee_toe = abs(knee_position_x - toe_position_x)
 
@@ -271,7 +292,6 @@ while cap.isOpened():
             thigh_half_length = int(
                 math.sqrt(
                     (point_knee[0][0] - centroid_thigh[0]) ** 2 + (point_knee[0][1] - centroid_thigh[1]) ** 2))
-
             
             #Update HEAD-THIGH indicator
             if distance <= thigh_half_length:  # EXPERT ADVICE

@@ -55,7 +55,8 @@
         },
         {
             "name": "ear_thighcentroid_length",
-            "type": "euclidean",
+            "type": "absolute",
+            "axis": 0,
             "points": [
                 "left_ear",
                 "thigh_centroid"
