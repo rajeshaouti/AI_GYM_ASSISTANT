@@ -156,24 +156,13 @@ while cap.isOpened():
             #PREPROCESSING MEASUREMENTS
             for measurement in exercise["measurements"]:
                 if measurement["type"] == "euclidean":
-                    # print(measurement["name"])
-                    # print(landmarkID)
-                    # print(landmarkID[measurement["points"][0]])
-                    # print(landmarkID[measurement["points"][1]])
                     point1 = landmarkID[measurement["points"][0]]
                     point2 = landmarkID[measurement["points"][1]]
                     if type(point1) == int:
                         point1 = aigym.find_point_position(point1,landmark_list)
                     if type(point2) == int:
                         point2 = aigym.find_point_position(point2,landmark_list)
-
-
                     measurements[measurement["name"]] = aigym.euclidean_distance(point1, point2)
-                    # print(aigym.euclidean_distance(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]]))
-                elif measurement["type"] == "multiply":
-                    measurements[measurement["name"]] = measurements[measurement["initial"]]*measurement["value"]
-                elif measurement["type"] == "centroid":
-                    landmarkID[measurement["name"]] = aigym.findcentroid(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]], landmark_list)
                 elif measurement["type"] == "absolute":
                     point1 = landmarkID[measurement["points"][0]]
                     point2 = landmarkID[measurement["points"][1]]
@@ -182,6 +171,11 @@ while cap.isOpened():
                     if type(point2) == int:
                         point2 = aigym.find_point_position(point2,landmark_list)
                     measurements[measurement["name"]] = aigym.absolute_distance(point1, point2 ,axis = measurement["axis"])
+                elif measurement["type"] == "multiply":
+                    measurements[measurement["name"]] = measurements[measurement["initial"]]*measurement["value"]
+                elif measurement["type"] == "centroid":
+                    landmarkID[measurement["name"]] = aigym.findcentroid(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]], landmark_list)
+                
 
             #UPDATING INDICATORS
             for indicator_index in range(numberOfIndicators):

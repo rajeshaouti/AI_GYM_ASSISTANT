@@ -72,6 +72,7 @@
                 "left_hip",
                 "left_knee"
             ],
+            "plot": true,
             "good": {
                 "min": 0,
                 "max": 125
