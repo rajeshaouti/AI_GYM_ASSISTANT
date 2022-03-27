@@ -17,6 +17,8 @@ import aigym
 ## AruCo Tracking
 TRACK_ARUCO = False
 
+#CONSTANTS
+inf = float("inf")
 
 # Initiation
 index = count()
@@ -33,14 +35,17 @@ EXERCISE = "squats.json"
 
 landmarkID = json.loads(open("mediapipe_landmarks.json").read())
 exercise = json.loads(open(EXERCISE).read())
-measurements = {}
+numberOfIndicators = len(exercise["indicators"])
+indicator_status = [-1]*numberOfIndicators
+total_sequences_length = len(exercise["sequence"])
+present_sequence = 0
+measurements = {"inf":inf,"-inf":-inf}
+good_rep_count = 0
+rep_count = 0
 
 
 print("LOADING EXERCISE: "+exercise["name"])
 print("VERSION: "+exercise["version"])
-for measurement in exercise["measurements"]:
-    measurement
-
 
 # mediapipe module
 mpDraw = mp.solutions.drawing_utils
@@ -148,6 +153,65 @@ while cap.isOpened():
             landmark_list.append([id, cx, cy])
 
         if len(landmark_list) != 0:
+            #PREPROCESSING MEASUREMENTS
+            for measurement in exercise["measurements"]:
+                if measurement["type"] == "euclidean":
+                    measurements[measurement["name"]] = aigym.euclidean_distance(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]])
+                elif measurement["type"] == "multiply":
+                    measurements[measurement["name"]] = measurements[measurement["initial"]]*measurement["value"]
+                elif measurement["type"] == "centroid":
+                    landmarkID[measurement["name"]] = aigym.findcentroid(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]], landmark_list)
+                elif measurement["type"] == "absolute":
+                    measurements[measurement["name"]] = aigym.absolute_distance(aigym.find_point_position(landmarkID[measurement["points"][0]],landmark_list), aigym.find_point_position(landmarkID[measurement["points"][1]], landmark_list),axis = measurement["axis"])
+
+            #UPDATING INDICATORS
+            for indicator_index in range(numberOfIndicators):
+                indicator = exercise["indicators"][indicator_index]
+                if indicator["type"] == "angle":
+                    point = aigym.findpositions(landmarkID[indicator["points"][0]], landmarkID[indicator["points"][1]], landmarkID[indicator["points"][2]], landmark_list)
+                    angle = aigym.calculate_angle(point)
+                    status = -1
+                    if status == -1 and ("good" in indicator):
+                        if angle <indicator["good"].get("max",inf) and angle > indicator["good"].get("min",-inf):
+                            status = 0
+                    
+                    if status == -1 and ("intermediate" in indicator):
+                        if angle <indicator["intermediate"].get("max",inf) and angle > indicator["intermediate"].get("min",-inf):
+                            status = 1
+                    
+                    if status == -1:
+                        status = 2
+                    
+                    indicator_status[indicator_index] = status
+                
+                elif indicator["type"] == "relative":
+                    attribute = measurements[indicator["name"]]
+                    status = -1
+                    if status == -1 and ("good" in indicator):
+                        if attribute <measurements[indicator["good"].get("max","inf")] and attribute > measurements[indicator["good"].get("min","-inf")]:
+                            status = 0
+                    
+                    if status == -1 and ("intermediate" in indicator):
+                        if attribute <measurements[indicator["intermediate"].get("max","inf")] and attribute > measurements[indicator["intermediate"].get("min","-inf")]:
+                            status = 1
+                    
+                    if status == -1:
+                        status = 2
+                    
+                    indicator_status[indicator_index] = status
+            
+            ##COUNTING REPS
+            sequence = exercise["sequence"][present_sequence]
+            if sequence["type"] == "angle":
+                point = aigym.findpositions(landmarkID[sequence["points"][0]], landmarkID[sequence["points"][1]], landmarkID[sequence["points"][2]], landmark_list)
+                angle = aigym.calculate_angle(point)
+                if angle <sequence.get("max",inf) and angle > sequence.get("min",-inf):
+                    present_sequence = (present_sequence+1)%total_sequences_length
+                    rep_count+=1
+                    if 2 not in indicator_status:
+                        good_rep_count+=1
+            
+            print("rep_counter",rep_count,good_rep_count)
 
             # Calculate angle back
             point_back = aigym.findpositions(landmarkID["left_shoulder"], landmarkID["left_hip"], landmarkID["left_knee"], landmark_list)
@@ -227,7 +291,7 @@ while cap.isOpened():
                         cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
             cv2.rectangle(img, (600, 125), (625, 150), color_Head_thigh, cv2.FILLED)
 
-            # Drawing a Bounding box
+            # MUST HAVE: Drawing a Bounding box full body
             toe_1_position = aigym.find_point_position(landmarkID["left_heel"], landmark_list)
             toe_2_position = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)
             toe_3_position = aigym.find_point_position(landmarkID["right_heel"], landmark_list)
