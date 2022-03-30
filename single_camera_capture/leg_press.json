@@ -6,7 +6,7 @@
             "name": "foot_length",
             "type": "euclidean",
             "points": [
-                "left_ankle",
+                "right_foot_index",
                 "left_foot_index"
             ]
         },
@@ -23,44 +23,32 @@
             "value": 1.3
         },
         {
-            "name": "toe_knee_length",
-            "type": "absolute",
-            "axis": 0,
-            "points": [
-                "left_knee",
-                "left_foot_index"
-            ]
+            "name": "foot_length_0.8",
+            "initial": "foot_length",
+            "type": "multiply",
+            "value": 0.8
         },
         {
-            "name": "thigh_centroid",
-            "type": "centroid",
-            "points": [
-                "left_hip",
-                "left_knee"
-            ]
-        },
-        {
-            "name": "thigh_half_length",
+            "name": "knee_length",
             "type": "euclidean",
             "points": [
-                "left_hip",
-                "thigh_centroid"
+                "left_knee",
+                "right_knee"
             ]
         },
         {
-            "name": "thigh_half_length_1.3",
-            "initial": "thigh_half_length",
+            "name": "shoulder_length",
+            "type": "euclidean",
+            "points": [
+                "left_shoulder",
+                "right_shoulder"
+            ]
+        },
+        {
+            "name": "shoulder_length_1.3",
+            "initial": "shoulder_length",
             "type": "multiply",
             "value": 1.3
-        },
-        {
-            "name": "ear_thighcentroid_length",
-            "type": "absolute",
-            "axis": 0,
-            "points": [
-                "left_ear",
-                "thigh_centroid"
-            ]
         }
     ],
     "indicators": [
@@ -74,16 +62,16 @@
             ],
             "plot": true,
             "good": {
-                "min": 0,
-                "max": 125
+                "min": 45,
+                "max": 90
             },
             "intermediate": {
-                "min": 120,
-                "max": 135
+                "min": 30,
+                "max": 120
             },
             "bad": {
-                "min": 135,
-                "max": 360,
+                "min": 10,
+                "max": 180,
                 "warning": "Back angle too high"
             }
         },
@@ -91,20 +79,20 @@
             "name": "toe_knee_length",
             "type": "relative",
             "good": {
-                "max": "foot_length_1.1"
+                "min": "foot_length_0.8"
             },
             "intermediate": {
                 "max": "foot_length_1.3"
             }
         },
         {
-            "name": "ear_thighcentroid_length",
+            "name": "toe_shoulder_length",
             "type": "relative",
             "good": {
-                "max": "thigh_half_length"
+                "min": "shoulder_length"
             },
             "intermediate": {
-                "max": "thigh_half_length_1.3"
+                "max": "shoulder_length_1.3"
             }
         }
     ],
@@ -117,7 +105,7 @@
                 "left_knee",
                 "left_ankle"
             ],
-            "max": 6
+            "max": 160
         },
         {
             "name": "knee_angle",
@@ -127,7 +115,7 @@
                 "left_knee",
                 "left_ankle"
             ],
-            "min": 109
+            "min": 70
         }
     ]
 }
