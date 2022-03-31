@@ -132,5 +132,29 @@
             ],
             "min": 109
         }
+    ],
+    "plot": [
+        {
+            "name": "knee",
+            "type": "angle",
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "indicator": 0
+        },
+        {
+            "name": "thigh_centroid",
+            "type": "point",
+            "measurement": "thigh_centroid",
+            "indicator": 1
+        },
+        {
+            "name": "knee",
+            "type": "point",
+            "point": "left_ear",
+            "indicator": 2
+        }
     ]
 }

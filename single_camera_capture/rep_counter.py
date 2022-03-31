@@ -26,6 +26,7 @@ ptime = 0
 color_red = (0, 0, 255)
 color_green = (0, 255, 0)
 color_yellow = (0, 255, 255)
+indicator_colors = [color_green,color_yellow,color_red]
 good_count = 0
 direction = 0
 count = 0
@@ -245,7 +246,22 @@ while cap.isOpened():
                         good_rep_count+=0.5
             
             print("rep_count",rep_count,"good_rep_count",good_rep_count,indicator_status,angle,present_sequence)
-            # print(measurements)
+            
+            ##ADDITIONAL PLOTTING
+            for plot in exercise["plot"]:
+                if plot["type"] == "angle":
+                    point = aigym.findpositions(landmarkID[plot["points"][0]], landmarkID[plot["points"][1]], landmarkID[plot["points"][2]], landmark_list)
+                    angle = aigym.calculate_angle(point)
+                    aigym.plot(point, indicator_colors[indicator_status[plot["indicator"]]], angle, img)
+                
+                elif plot["type"] == "point":
+                    point = landmarkID[measurement["points"][1]]
+                    if type(point) == int:
+                        point = aigym.find_point_position(point1,landmark_list)
+                    aigym.plot_point(point, indicator_colors[indicator_status[plot["indicator"]]], img)
+
+
+
 
             # # Calculate angle back
             # point_back = aigym.findpositions(landmarkID["left_shoulder"], landmarkID["left_hip"], landmarkID["left_knee"], landmark_list)
@@ -265,15 +281,15 @@ while cap.isOpened():
             # plot1 = aigym.plot(point_back, color_back, angle_back, img)
 
 
-            # # Calculate knee angle ,knee position ,toe position
-            point_knee = aigym.findpositions(landmarkID["left_hip"], landmarkID["left_knee"], landmarkID["left_ankle"], landmark_list)
-            angle_knee = aigym.calculate_angle(point_knee)
+            # # # Calculate knee angle ,knee position ,toe position
+            # point_knee = aigym.findpositions(landmarkID["left_hip"], landmarkID["left_knee"], landmarkID["left_ankle"], landmark_list)
+            # angle_knee = aigym.calculate_angle(point_knee)
             # knee_position = aigym.find_point_position(landmarkID["left_knee"], landmark_list)
             # knee_position_x = knee_position[0]
             # toe_position_x = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)[0]
 
 
-            # # Calculating knee overflow through foot distance
+            # # # Calculating knee overflow through foot distance
             # ankle = aigym.find_point_position(landmarkID["left_ankle"], landmark_list)
             # toe = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)
             # foot_length = int(math.sqrt((ankle[0] - toe[0]) ** 2 + (ankle[1] - toe[1]) ** 2))
@@ -291,35 +307,35 @@ while cap.isOpened():
             # else:
             #     color_knee = color_red
 
-            # #
-            # cv2.putText(img, str('Knee'), (550, 90),
-            #             cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
-            # cv2.rectangle(img, (600, 75), (625, 100), color_knee, cv2.FILLED)
+            # # #
+            # # cv2.putText(img, str('Knee'), (550, 90),
+            # #             cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
+            # # cv2.rectangle(img, (600, 75), (625, 100), color_knee, cv2.FILLED)
             # plot2 = aigym.plot(point_knee, color_knee, abs(knee_position_x - toe_position_x), img)
 
-            centroid_thigh = aigym.findcentroid(landmarkID["left_hip"], landmarkID["left_knee"], landmark_list)
+            # centroid_thigh = aigym.findcentroid(landmarkID["left_hip"], landmarkID["left_knee"], landmark_list)
 
-            ear_position = aigym.find_point_position(landmarkID["left_ear"], landmark_list)
+            # ear_position = aigym.find_point_position(landmarkID["left_ear"], landmark_list)
 
-            distance_H = (ear_position[0] - centroid_thigh[0])
-            distance = abs(centroid_thigh[0] - ear_position[0])
-            thigh_half_length = int(
-                math.sqrt(
-                    (point_knee[0][0] - centroid_thigh[0]) ** 2 + (point_knee[0][1] - centroid_thigh[1]) ** 2))
+            # distance_H = (ear_position[0] - centroid_thigh[0])
+            # distance = abs(centroid_thigh[0] - ear_position[0])
+            # thigh_half_length = int(
+            #     math.sqrt(
+            #         (point_knee[0][0] - centroid_thigh[0]) ** 2 + (point_knee[0][1] - centroid_thigh[1]) ** 2))
             
-            #Update HEAD-THIGH indicator
-            if distance <= thigh_half_length:  # EXPERT ADVICE
-                color_Head_thigh = color_green
-                aigym.plot_point(centroid_thigh, color_Head_thigh, img)
-                aigym.plot_point(ear_position, color_Head_thigh, img)
-            elif distance <= 1.3 * thigh_half_length:  # EXPERT ADVICE
-                color_Head_thigh = color_yellow
-                aigym.plot_point(centroid_thigh, color_Head_thigh, img)
-                aigym.plot_point(ear_position, color_Head_thigh, img)
-            else:
-                color_Head_thigh = color_red
-                aigym.plot_point(centroid_thigh, color_Head_thigh, img)
-                aigym.plot_point(ear_position, color_Head_thigh, img)
+            # #Update HEAD-THIGH indicator
+            # if distance <= thigh_half_length:  # EXPERT ADVICE
+            #     color_Head_thigh = color_green
+            #     aigym.plot_point(centroid_thigh, color_Head_thigh, img)
+            #     aigym.plot_point(ear_position, color_Head_thigh, img)
+            # elif distance <= 1.3 * thigh_half_length:  # EXPERT ADVICE
+            #     color_Head_thigh = color_yellow
+            #     aigym.plot_point(centroid_thigh, color_Head_thigh, img)
+            #     aigym.plot_point(ear_position, color_Head_thigh, img)
+            # else:
+            #     color_Head_thigh = color_red
+            #     aigym.plot_point(centroid_thigh, color_Head_thigh, img)
+            #     aigym.plot_point(ear_position, color_Head_thigh, img)
 
             # cv2.putText(img, str('Head-Thigh'), (500, 140),
             #             cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
@@ -334,17 +350,17 @@ while cap.isOpened():
             if toe_1_position > toe_2_position:  # left view
                 rect_point_1 = int(toe_1_position[0] * 1.15), toe_1_position[1]
                 rect_point_4 = int(toe_2_position[0] * 0.85), 10
-                cv2.rectangle(img, rect_point_1, rect_point_4, color_Head_thigh, 1, cv2.LINE_AA)
+                cv2.rectangle(img, rect_point_1, rect_point_4, color_green, 1, cv2.LINE_AA)
             else:  # right view
                 rect_point_1 = int(toe_3_position[0] * 0.85), toe_3_position[1]
                 rect_point_4 = int(toe_4_position[0] * 1.15), 10
-                cv2.rectangle(img, rect_point_1, rect_point_4, color_Head_thigh, 2, cv2.LINE_AA)
+                cv2.rectangle(img, rect_point_1, rect_point_4, color_green, 2, cv2.LINE_AA)
 
-            plot_horizontal_column = aigym.plot_bar_horizontal(distance_H, img, thigh_half_length, color_Head_thigh)
+            # plot_horizontal_column = aigym.plot_bar_horizontal(distance_H, img, thigh_half_length, color_green)
 
 
             ## Updating the FINAL count of the reps
-            plot4 = aigym.plot_bar(angle_knee, (5, 110), img)  #  Expert Advice  - Angle limits
+            # plot4 = aigym.plot_bar(angle_knee, (5, 110), img)  #  Expert Advice  - Angle limits
             # color_list = [color_knee, color_Head_thigh, color_back]
             # if plot4[0] == 100:
             #     if direction == 0:
@@ -363,6 +379,9 @@ while cap.isOpened():
             #         else:
             #             good_count += 0
 
+
+
+            ## DATASET COLLECTION AND LOGGING
             pose1 = results.pose_landmarks.landmark
             pose_data = list(
                 np.array([[int((landmark.x) * w), int((landmark.y) * h)] for landmark in pose1]).flatten())
@@ -383,7 +402,7 @@ while cap.isOpened():
             cv2.putText(img, 'TOTAL REPS', (25, 25),
                         cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
             cv2.rectangle(img, (120, 5), (170, 35), (0, 0, 0), cv2.FILLED)
-            cv2.putText(img, str(rep_count), (130, 35),
+            cv2.putText(img, str(int(rep_count)), (130, 35),
                         cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
             cv2.putText(img, 'GOOD REPS', (25, 75),
