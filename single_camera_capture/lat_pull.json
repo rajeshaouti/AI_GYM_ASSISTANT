@@ -38,7 +38,7 @@
                 "right_shoulder",
                 "left_shoulder"
             ],
-            "min": 29
+            "min": 220
         },
         {
             "name": "right_shoulder_angle",
@@ -48,7 +48,7 @@
                 "right_shoulder",
                 "left_shoulder"
             ],
-            "max": 119
+            "max": 121
         },
         {
             "name": "left_shoulder_angle",
@@ -58,7 +58,7 @@
                 "left_shoulder",
                 "right_shoulder"
             ],
-            "min": 29
+            "min": 220
         },
         {
             "name": "left_shoulder_angle",
@@ -68,7 +68,29 @@
                 "left_shoulder",
                 "right_shoulder"
             ],
-            "max": 119
+            "max": 121
+        }
+    ],
+    "plot":[
+        {
+            "name": "right_shoulder",
+            "type": "angle",
+            "points":[
+                "right_elbow",
+                "right_shoulder",
+                "left_shoulder"
+            ],
+            "indicator": 0
+        },
+        {
+            "name": "left_shoulder",
+            "type": "angle",
+            "points":[
+                "left_elbow",
+                "left_shoulder",
+                "right_shoulder"
+            ],
+            "indicator": 1
         }
     ]
 }
