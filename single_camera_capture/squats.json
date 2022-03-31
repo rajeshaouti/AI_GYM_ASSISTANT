@@ -95,6 +95,9 @@
             },
             "intermediate": {
                 "max": "foot_length_1.3"
+            },
+            "bad": {
+                "warning": "Foot length too high"
             }
         },
         {
