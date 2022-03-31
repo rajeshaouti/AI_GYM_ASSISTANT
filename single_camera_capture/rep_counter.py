@@ -26,18 +26,19 @@ ptime = 0
 color_red = (0, 0, 255)
 color_green = (0, 255, 0)
 color_yellow = (0, 255, 255)
-indicator_colors = [color_green,color_yellow,color_red]
+color_cyan = (255, 255, 0)
+indicator_colors = [color_green,color_yellow,color_red,color_cyan]
 good_count = 0
 direction = 0
 count = 0
 point_no = []
 
-EXERCISE = "squats.json"
+EXERCISE = "lat_pull.json"
 
 landmarkID = json.loads(open("mediapipe_landmarks.json").read())
 exercise = json.loads(open(EXERCISE).read())
 numberOfIndicators = len(exercise["indicators"])
-indicator_status = [-1]*numberOfIndicators
+indicator_status = [-1]*(numberOfIndicators+1)
 total_sequences_length = len(exercise["sequence"])
 present_sequence = 0
 measurements = {"inf":inf,"-inf":-inf}
@@ -57,7 +58,7 @@ pose = mpPose.Pose()
 tracker = cv2.TrackerCSRT_create()
 
 # Capture the video feed
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("lat_pull.mp4")
 
 # Run the code for plotting aruco
 _thread.start_new_thread(aigym.graph_plot, ())
