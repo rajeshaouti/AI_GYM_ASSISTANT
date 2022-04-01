@@ -84,9 +84,9 @@
             "name": "left_shoulder",
             "type": "angle",
             "points": [
-                "left_elbow",
+                "right_shoulder",
                 "left_shoulder",
-                "right_shoulder"
+                "left_elbow"
             ],
             "indicator": -1
         }
