@@ -1,7 +1,29 @@
 {
     "name": "lat_pull",
     "version": "1.0",
-    "measurements": [],
+    "measurements": [
+        {
+            "name": "left_shoulder_length",
+            "type": "euclidean",
+            "points": [
+                "left_elbow",
+                "left_shoulder",
+                "right_shoulder"
+            ]
+        },
+        {
+            "name": "left_shoulder_length_0.9",
+            "initial": "left_shoulder_length",
+            "type": "multiply",
+            "value": 0.9
+        },
+        {
+            "name": "left_shoulder_length_1.1",
+            "initial": "left_shoulder_length",
+            "type": "multiply",
+            "value": 1.1
+        }
+    ],
     "indicators": [
         {
             "name": "angle_back",
@@ -25,6 +47,17 @@
                 "max": 360,
                 "warning": "Back angle too high"
             }
+        },
+        {
+            "name": "left_shoulder_length",
+            "type": "relative",
+            "good": {
+                "max": "left_shoulder_length"
+            },
+            "intermediate":{
+                "min": "left_shoulder_length_0.9",
+                "max": "left_shoulder_length_1.1"
+            }
         }
     ],
     "sequence": [
@@ -46,27 +79,7 @@
                 "right_shoulder",
                 "left_shoulder"
             ],
-            "max": 121
-        },
-        {
-            "name": "left_shoulder_angle",
-            "type": "angle",
-            "points": [
-                "left_elbow",
-                "left_shoulder",
-                "right_shoulder"
-            ],
-            "min": 220
-        },
-        {
-            "name": "left_shoulder_angle",
-            "type": "angle",
-            "points": [
-                "left_elbow",
-                "left_shoulder",
-                "right_shoulder"
-            ],
-            "max": 121
+            "max": 131
         }
     ],
     "plot": [
