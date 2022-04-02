@@ -62,8 +62,8 @@
             ],
             "plot": true,
             "good": {
-                "min": 90,
-                "max": 135
+                "min": 40,
+                "max": 90
             },
             "intermediate": {
                 "min": 30,
@@ -72,6 +72,29 @@
             "bad": {
                 "min": 10,
                 "max": 180,
+                "warning": "Back angle too high"
+            }
+        },
+        {
+            "name": "angle_knee",
+            "type": "angle",
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "plot": true,
+            "good": {
+                "min": 200,
+                "max": 290
+            },
+            "intermediate": {
+                "min": 190,
+                "max": 300
+            },
+            "bad": {
+                "min": 10,
+                "max": 360,
                 "warning": "Back angle too high"
             }
         },
@@ -105,7 +128,7 @@
                 "left_knee",
                 "left_ankle"
             ],
-            "min": 250
+            "max": 210
         },
         {
             "name": "knee_angle",
@@ -115,7 +138,19 @@
                 "left_knee",
                 "left_ankle"
             ],
-            "max": 300
+            "min": 270
+        }
+    ],
+    "plot": [
+        {
+            "name": "knee",
+            "type": "angle",
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "indicator": 0
         }
     ]
 }
