@@ -33,7 +33,7 @@ direction = 0
 count = 0
 point_no = []
 
-EXERCISE = "lat_pull.json"
+EXERCISE = "lat_pull_2.json"
 
 landmarkID = json.loads(open("mediapipe_landmarks.json").read())
 exercise = json.loads(open(EXERCISE).read())
@@ -58,8 +58,8 @@ pose = mpPose.Pose()
 tracker = cv2.TrackerCSRT_create()
 
 # Capture the video feed
-cap = cv2.VideoCapture("latpull_back.mp4")
-cap2 = cv2.VideoCapture("latpull_side.mp4")
+cap = cv2.VideoCapture("resize_latpull_back.mp4")
+cap2 = cv2.VideoCapture("resize_latpull_side.mp4")
 
 # Run the code for plotting aruco
 _thread.start_new_thread(aigym.graph_plot, ())
@@ -105,8 +105,9 @@ while cap.isOpened():
             pass
     
     #Updating the camera feed
-    ok, img = cap.read()
+    ok, img1 = cap.read()
     ok, img2 = cap2.read()
+    img = [img1,img2]
 
     timer = cv2.getTickCount()
 
@@ -145,51 +146,61 @@ while cap.isOpened():
 
 # Pose Dectection
 
-    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    results = pose.process(imgRGB)
+    imgRGB = cv2.cvtColor(img[0], cv2.COLOR_BGR2RGB)
+    imgRGB1 = cv2.cvtColor(img[1], cv2.COLOR_BGR2RGB)
+    results = []
+    results.append(pose.process(imgRGB))
+    results.append(pose.process(imgRGB1))
 
     #detecting only if pose landmarks are present
-    if results.pose_landmarks:
-        h, w, c = img.shape
-        landmark_list = []
-        for id, lm in enumerate(results.pose_landmarks.landmark):
-            cx, cy = int(lm.x * w), int(lm.y * h)
-            landmark_list.append([id, cx, cy])
-        
-        text_start_x = 500
-        text_start_y = 40
-        box_start_x = 600
-        box_start_y = 25
+    if results[0].pose_landmarks and results[1].pose_landmarks:
+        h, w, c = img[0].shape
+        landmark_list = [[],[]]
 
-        if len(landmark_list) != 0:
+        #landmarks for camera 0
+        for id, lm in enumerate(results[0].pose_landmarks.landmark):
+            cx, cy = int(lm.x * w), int(lm.y * h)
+            landmark_list[0].append([id, cx, cy])
+        
+        #landmark for camera 1
+        for id, lm in enumerate(results[1].pose_landmarks.landmark):
+            cx, cy = int(lm.x * w), int(lm.y * h)
+            landmark_list[1].append([id, cx, cy])
+        
+        text_start_x = [500,500]
+        text_start_y = [40,40]
+        box_start_x = [600,600]
+        box_start_y = [25,25]
+
+        if (len(landmark_list[0]) != 0) and (len(landmark_list[1]) != 0):
             #PREPROCESSING MEASUREMENTS
             for measurement in exercise["measurements"]:
                 if measurement["type"] == "euclidean":
                     point1 = landmarkID[measurement["points"][0]]
                     point2 = landmarkID[measurement["points"][1]]
                     if type(point1) == int:
-                        point1 = aigym.find_point_position(point1,landmark_list)
+                        point1 = aigym.find_point_position(point1,landmark_list[measurement["camera"]])
                     if type(point2) == int:
-                        point2 = aigym.find_point_position(point2,landmark_list)
+                        point2 = aigym.find_point_position(point2,landmark_list[measurement["camera"]])
                     measurements[measurement["name"]] = aigym.euclidean_distance(point1, point2)
                 elif measurement["type"] == "absolute":
                     point1 = landmarkID[measurement["points"][0]]
                     point2 = landmarkID[measurement["points"][1]]
                     if type(point1) == int:
-                        point1 = aigym.find_point_position(point1,landmark_list)
+                        point1 = aigym.find_point_position(point1,landmark_list[measurement["camera"]])
                     if type(point2) == int:
-                        point2 = aigym.find_point_position(point2,landmark_list)
+                        point2 = aigym.find_point_position(point2,landmark_list[measurement["camera"]])
                     measurements[measurement["name"]] = aigym.absolute_distance(point1, point2 ,axis = measurement["axis"])
                 elif measurement["type"] == "multiply":
                     measurements[measurement["name"]] = measurements[measurement["initial"]]*measurement["value"]
                 elif measurement["type"] == "centroid":
-                    landmarkID[measurement["name"]] = aigym.findcentroid(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]], landmark_list)
+                    landmarkID[measurement["name"]] = aigym.findcentroid(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]], landmark_list[measurement["camera"]])
 
             #UPDATING INDICATORS
             for indicator_index in range(numberOfIndicators):
                 indicator = exercise["indicators"][indicator_index]
                 if indicator["type"] == "angle":
-                    point = aigym.findpositions(landmarkID[indicator["points"][0]], landmarkID[indicator["points"][1]], landmarkID[indicator["points"][2]], landmark_list)
+                    point = aigym.findpositions(landmarkID[indicator["points"][0]], landmarkID[indicator["points"][1]], landmarkID[indicator["points"][2]], landmark_list[indicator["camera"]])
                     angle = aigym.calculate_angle(point)
                     status = -1
                     box_color = color_red
@@ -207,7 +218,7 @@ while cap.isOpened():
                         status = 2
                         box_color = color_red
                     
-                    plot1 = aigym.plot(point, box_color, angle, img)
+                    plot1 = aigym.plot(point, box_color, angle, img[indicator["camera"]])
                 
                 elif indicator["type"] == "relative":
                     attribute = measurements[indicator["name"]]
@@ -231,16 +242,18 @@ while cap.isOpened():
                     
                 indicator_status[indicator_index] = status
                 
-                cv2.putText(img, indicator["name"], (text_start_x, text_start_y), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
-                text_start_y+=50
-                cv2.rectangle(img, (box_start_x, box_start_y), (box_start_x+25, box_start_y+25), box_color, cv2.FILLED)
-                box_start_y+=50
+                cv2.putText(img[indicator["camera"]], indicator["name"], (text_start_x[indicator["camera"]], text_start_y[indicator["camera"]]), 
+                cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
+                text_start_y[indicator["camera"]]+=50
+                cv2.rectangle(img[indicator["camera"]], (box_start_x[indicator["camera"]], box_start_y[indicator["camera"]]), 
+                (box_start_x[indicator["camera"]]+25, box_start_y[indicator["camera"]]+25), box_color, cv2.FILLED)
+                box_start_y[indicator["camera"]]+=50
                 
             
             ##COUNTING REPS
             sequence = exercise["sequence"][present_sequence]
             if sequence["type"] == "angle":
-                point = aigym.findpositions(landmarkID[sequence["points"][0]], landmarkID[sequence["points"][1]], landmarkID[sequence["points"][2]], landmark_list)
+                point = aigym.findpositions(landmarkID[sequence["points"][0]], landmarkID[sequence["points"][1]], landmarkID[sequence["points"][2]], landmark_list[indicator["camera"]])
                 angle = aigym.calculate_angle(point)
                 if angle <sequence.get("max",inf) and angle > sequence.get("min",-inf):
                     present_sequence = (present_sequence+1)%total_sequences_length
@@ -253,139 +266,34 @@ while cap.isOpened():
             ##ADDITIONAL PLOTTING
             for plot in exercise["plot"]:
                 if plot["type"] == "angle":
-                    point = aigym.findpositions(landmarkID[plot["points"][0]], landmarkID[plot["points"][1]], landmarkID[plot["points"][2]], landmark_list)
+                    point = aigym.findpositions(landmarkID[plot["points"][0]], landmarkID[plot["points"][1]], landmarkID[plot["points"][2]], landmark_list[indicator["camera"]])
                     angle = aigym.calculate_angle(point)
-                    aigym.plot(point, indicator_colors[indicator_status[plot["indicator"]]], angle, img)
+                    aigym.plot(point, indicator_colors[indicator_status[plot["indicator"]]], angle, img[plot["camera"]])
                 
                 elif plot["type"] == "point":
                     point = landmarkID[measurement["points"][1]]
                     if type(point) == int:
-                        point = aigym.find_point_position(point1,landmark_list)
-                    aigym.plot_point(point, indicator_colors[indicator_status[plot["indicator"]]], img)
-
-
-
-
-            # # Calculate angle back
-            # point_back = aigym.findpositions(landmarkID["left_shoulder"], landmarkID["left_hip"], landmarkID["left_knee"], landmark_list)
-            # angle_back = aigym.calculate_angle(point_back)
-
-            # if angle_back < 125:  # EXPERT ADVICE
-            #     color_back = color_green
-            # elif 135 > angle_back > 120:  # EXPERT ADVICE
-            #     color_back = color_yellow
-            # else:
-            #     color_back = color_red
-
-            # cv2.putText(img, str('Back'), (550, 40),
-            #             cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
-            # cv2.rectangle(img, (600, 25), (625, 50), color_back, cv2.FILLED)
-
-            # plot1 = aigym.plot(point_back, color_back, angle_back, img)
-
-
-            # # # Calculate knee angle ,knee position ,toe position
-            # point_knee = aigym.findpositions(landmarkID["left_hip"], landmarkID["left_knee"], landmarkID["left_ankle"], landmark_list)
-            # angle_knee = aigym.calculate_angle(point_knee)
-            # knee_position = aigym.find_point_position(landmarkID["left_knee"], landmark_list)
-            # knee_position_x = knee_position[0]
-            # toe_position_x = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)[0]
-
-
-            # # # Calculating knee overflow through foot distance
-            # ankle = aigym.find_point_position(landmarkID["left_ankle"], landmark_list)
-            # toe = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)
-            # foot_length = int(math.sqrt((ankle[0] - toe[0]) ** 2 + (ankle[1] - toe[1]) ** 2))
-            # foot_length1 = aigym.euclidean_distance(ankle, toe)
-
-            # distance_knee_toe = abs(knee_position_x - toe_position_x)
-
-
-            # # Updating KNEE indicators
-            # # These can be updated to warn the user about posture as well
-            # if distance_knee_toe < 1.1 * foot_length:  # EXPERT ADVICE
-            #     color_knee = color_green
-            # elif distance_knee_toe < 1.3 * foot_length:  # EXPERT ADVICE
-            #     color_knee = color_yellow
-            # else:
-            #     color_knee = color_red
-
-            # # #
-            # # cv2.putText(img, str('Knee'), (550, 90),
-            # #             cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
-            # # cv2.rectangle(img, (600, 75), (625, 100), color_knee, cv2.FILLED)
-            # plot2 = aigym.plot(point_knee, color_knee, abs(knee_position_x - toe_position_x), img)
-
-            # centroid_thigh = aigym.findcentroid(landmarkID["left_hip"], landmarkID["left_knee"], landmark_list)
-
-            # ear_position = aigym.find_point_position(landmarkID["left_ear"], landmark_list)
-
-            # distance_H = (ear_position[0] - centroid_thigh[0])
-            # distance = abs(centroid_thigh[0] - ear_position[0])
-            # thigh_half_length = int(
-            #     math.sqrt(
-            #         (point_knee[0][0] - centroid_thigh[0]) ** 2 + (point_knee[0][1] - centroid_thigh[1]) ** 2))
-            
-            # #Update HEAD-THIGH indicator
-            # if distance <= thigh_half_length:  # EXPERT ADVICE
-            #     color_Head_thigh = color_green
-            #     aigym.plot_point(centroid_thigh, color_Head_thigh, img)
-            #     aigym.plot_point(ear_position, color_Head_thigh, img)
-            # elif distance <= 1.3 * thigh_half_length:  # EXPERT ADVICE
-            #     color_Head_thigh = color_yellow
-            #     aigym.plot_point(centroid_thigh, color_Head_thigh, img)
-            #     aigym.plot_point(ear_position, color_Head_thigh, img)
-            # else:
-            #     color_Head_thigh = color_red
-            #     aigym.plot_point(centroid_thigh, color_Head_thigh, img)
-            #     aigym.plot_point(ear_position, color_Head_thigh, img)
-
-            # cv2.putText(img, str('Head-Thigh'), (500, 140),
-            #             cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
-            # cv2.rectangle(img, (600, 125), (625, 150), color_Head_thigh, cv2.FILLED)
+                        point = aigym.find_point_position(point1,landmark_list[indicator["camera"]])
+                    aigym.plot_point(point, indicator_colors[indicator_status[plot["indicator"]]], img[plot["camera"]])
 
             # MUST HAVE: Drawing a Bounding box full body
-            toe_1_position = aigym.find_point_position(landmarkID["left_heel"], landmark_list)
-            toe_2_position = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)
-            toe_3_position = aigym.find_point_position(landmarkID["right_heel"], landmark_list)
-            toe_4_position = aigym.find_point_position(landmarkID["right_foot_index"], landmark_list)
+            toe_1_position = aigym.find_point_position(landmarkID["left_heel"], landmark_list[0])
+            toe_2_position = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list[0])
+            toe_3_position = aigym.find_point_position(landmarkID["right_heel"], landmark_list[0])
+            toe_4_position = aigym.find_point_position(landmarkID["right_foot_index"], landmark_list[0])
 
             if toe_1_position > toe_2_position:  # left view
                 rect_point_1 = int(toe_1_position[0] * 1.15), toe_1_position[1]
                 rect_point_4 = int(toe_2_position[0] * 0.85), 10
-                cv2.rectangle(img, rect_point_1, rect_point_4, color_green, 1, cv2.LINE_AA)
+                cv2.rectangle(img[0], rect_point_1, rect_point_4, color_green, 1, cv2.LINE_AA)
             else:  # right view
                 rect_point_1 = int(toe_3_position[0] * 0.85), toe_3_position[1]
                 rect_point_4 = int(toe_4_position[0] * 1.15), 10
-                cv2.rectangle(img, rect_point_1, rect_point_4, color_green, 2, cv2.LINE_AA)
-
-            # plot_horizontal_column = aigym.plot_bar_horizontal(distance_H, img, thigh_half_length, color_green)
+                cv2.rectangle(img[0], rect_point_1, rect_point_4, color_green, 2, cv2.LINE_AA)
 
 
-            ## Updating the FINAL count of the reps
-            # plot4 = aigym.plot_bar(angle_knee, (5, 110), img)  #  Expert Advice  - Angle limits
-            # color_list = [color_knee, color_Head_thigh, color_back]
-            # if plot4[0] == 100:
-            #     if direction == 0:
-            #         direction = 1
-            #         count += 0.5
-            #         if color_red not in color_list:
-            #             good_count += 0.5
-            #         else:
-            #             good_count += 0
-            # if plot4[0] == 0:
-            #     if direction == 1:
-            #         direction = 0
-            #         count += 0.5
-            #         if color_red not in color_list:
-            #             good_count += 0.5
-            #         else:
-            #             good_count += 0
-
-
-
-            ## DATASET COLLECTION AND LOGGING
-            pose1 = results.pose_landmarks.landmark
+            ## DATASET COLLECTION AND LOGGING FROM FIRST CAMERA
+            pose1 = results[0].pose_landmarks.landmark
             pose_data = list(
                 np.array([[int((landmark.x) * w), int((landmark.y) * h)] for landmark in pose1]).flatten())
             
@@ -402,24 +310,24 @@ while cap.isOpened():
 
 
             ## UPDATING REPS
-            cv2.putText(img, 'TOTAL REPS', (25, 25),
+            cv2.putText(img[0], 'TOTAL REPS', (25, 25),
                         cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
-            cv2.rectangle(img, (120, 5), (170, 35), (0, 0, 0), cv2.FILLED)
-            cv2.putText(img, str(int(rep_count)), (130, 35),
+            cv2.rectangle(img[0], (120, 5), (170, 35), (0, 0, 0), cv2.FILLED)
+            cv2.putText(img[0], str(int(rep_count)), (130, 35),
                         cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
-            cv2.putText(img, 'GOOD REPS', (25, 75),
+            cv2.putText(img[0], 'GOOD REPS', (25, 75),
                         cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
-            cv2.rectangle(img, (120, 50), (170, 80), (0, 0, 0), cv2.FILLED)
-            cv2.putText(img, str(int(good_rep_count)), (130, 80),
+            cv2.rectangle(img[0], (120, 50), (170, 80), (0, 0, 0), cv2.FILLED)
+            cv2.putText(img[0], str(int(good_rep_count)), (130, 80),
                         cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2, cv2.LINE_AA)
     #
     # ctime = time.time()
     # fps = 1 / (ctime - ptime)
     # ptime = ctime
 
-    cv2.imshow('image', img)
-    cv2.imshow('image2', img2)
+    cv2.imshow('image', img[0])
+    cv2.imshow('image2', img[1])
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 cap.release()
