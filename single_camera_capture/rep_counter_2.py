@@ -157,15 +157,29 @@ while cap.isOpened():
         h, w, c = img[0].shape
         landmark_list = [[],[]]
 
+        body_coordinates = [
+            {"x1":inf,"y1":-inf,"x2":-inf,"y2":inf},
+            {"x1":inf,"y1":-inf,"x2":-inf,"y2":inf}
+        ]
+
         #landmarks for camera 0
         for id, lm in enumerate(results[0].pose_landmarks.landmark):
             cx, cy = int(lm.x * w), int(lm.y * h)
             landmark_list[0].append([id, cx, cy])
+            body_coordinates[0]["x1"] = min(cx,body_coordinates[0]["x1"])
+            body_coordinates[0]["y1"] = max(cy,body_coordinates[0]["y1"])
+            body_coordinates[0]["x2"] = max(cx,body_coordinates[0]["x2"])
+            body_coordinates[0]["y2"] = min(cy,body_coordinates[0]["y2"])
+
         
         #landmark for camera 1
         for id, lm in enumerate(results[1].pose_landmarks.landmark):
             cx, cy = int(lm.x * w), int(lm.y * h)
             landmark_list[1].append([id, cx, cy])
+            body_coordinates[1]["x1"] = min(cx,body_coordinates[1]["x1"])
+            body_coordinates[1]["y1"] = max(cy,body_coordinates[1]["y1"])
+            body_coordinates[1]["x2"] = max(cx,body_coordinates[1]["x2"])
+            body_coordinates[1]["y2"] = min(cy,body_coordinates[1]["y2"])
         
         text_start_x = [500,500]
         text_start_y = [40,40]
@@ -275,24 +289,16 @@ while cap.isOpened():
                     if type(point) == int:
                         point = aigym.find_point_position(point1,landmark_list[indicator["camera"]])
                     aigym.plot_point(point, indicator_colors[indicator_status[plot["indicator"]]], img[plot["camera"]])
+            
+            #DRAWING BODY BOUNDING BOX
+            cv2.rectangle(img[0], (int(body_coordinates[0]["x1"]*0.85),int(body_coordinates[0]["y1"]*1.15)), 
+            (int(body_coordinates[0]["x2"]*1.15),int(body_coordinates[0]["y2"]*0.85)), color_green, 1, cv2.LINE_AA)
 
-            # MUST HAVE: Drawing a Bounding box full body
-            toe_1_position = aigym.find_point_position(landmarkID["left_heel"], landmark_list[0])
-            toe_2_position = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list[0])
-            toe_3_position = aigym.find_point_position(landmarkID["right_heel"], landmark_list[0])
-            toe_4_position = aigym.find_point_position(landmarkID["right_foot_index"], landmark_list[0])
-
-            if toe_1_position > toe_2_position:  # left view
-                rect_point_1 = int(toe_1_position[0] * 1.15), toe_1_position[1]
-                rect_point_4 = int(toe_2_position[0] * 0.85), 10
-                cv2.rectangle(img[0], rect_point_1, rect_point_4, color_green, 1, cv2.LINE_AA)
-            else:  # right view
-                rect_point_1 = int(toe_3_position[0] * 0.85), toe_3_position[1]
-                rect_point_4 = int(toe_4_position[0] * 1.15), 10
-                cv2.rectangle(img[0], rect_point_1, rect_point_4, color_green, 2, cv2.LINE_AA)
+            cv2.rectangle(img[1], (int(body_coordinates[1]["x1"]*0.85),int(body_coordinates[1]["y1"]*1.15)), 
+            (int(body_coordinates[1]["x2"]*1.15),int(body_coordinates[1]["y2"]*0.85)), color_green, 1, cv2.LINE_AA)
 
 
-            ## DATASET COLLECTION AND LOGGING FROM FIRST CAMERA
+            ## DATASET COLLECTION AND LOGGING FROM CAMERA 0
             pose1 = results[0].pose_landmarks.landmark
             pose_data = list(
                 np.array([[int((landmark.x) * w), int((landmark.y) * h)] for landmark in pose1]).flatten())

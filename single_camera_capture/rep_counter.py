@@ -58,7 +58,7 @@ pose = mpPose.Pose()
 tracker = cv2.TrackerCSRT_create()
 
 # Capture the video feed
-cap = cv2.VideoCapture("lat_pull.mp4")
+cap = cv2.VideoCapture("resize_latpull_back.mp4")
 
 # Run the code for plotting aruco
 _thread.start_new_thread(aigym.graph_plot, ())
@@ -150,9 +150,16 @@ while cap.isOpened():
     if results.pose_landmarks:
         h, w, c = img.shape
         landmark_list = []
+
+        body_coordinates = {"x1":inf,"y1":-inf,"x2":-inf,"y2":inf}
+
         for id, lm in enumerate(results.pose_landmarks.landmark):
             cx, cy = int(lm.x * w), int(lm.y * h)
             landmark_list.append([id, cx, cy])
+            body_coordinates["x1"] = min(cx,body_coordinates["x1"])
+            body_coordinates["y1"] = max(cy,body_coordinates["y1"])
+            body_coordinates["x2"] = max(cx,body_coordinates["x2"])
+            body_coordinates["y2"] = min(cy,body_coordinates["y2"])
         
         text_start_x = 500
         text_start_y = 40
@@ -342,20 +349,21 @@ while cap.isOpened():
             #             cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1, cv2.LINE_AA)
             # cv2.rectangle(img, (600, 125), (625, 150), color_Head_thigh, cv2.FILLED)
 
-            # MUST HAVE: Drawing a Bounding box full body
-            toe_1_position = aigym.find_point_position(landmarkID["left_heel"], landmark_list)
-            toe_2_position = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)
-            toe_3_position = aigym.find_point_position(landmarkID["right_heel"], landmark_list)
-            toe_4_position = aigym.find_point_position(landmarkID["right_foot_index"], landmark_list)
+            # Drawing a Bounding box full body
 
-            if toe_1_position > toe_2_position:  # left view
-                rect_point_1 = int(toe_1_position[0] * 1.15), toe_1_position[1]
-                rect_point_4 = int(toe_2_position[0] * 0.85), 10
-                cv2.rectangle(img, rect_point_1, rect_point_4, color_green, 1, cv2.LINE_AA)
-            else:  # right view
-                rect_point_1 = int(toe_3_position[0] * 0.85), toe_3_position[1]
-                rect_point_4 = int(toe_4_position[0] * 1.15), 10
-                cv2.rectangle(img, rect_point_1, rect_point_4, color_green, 2, cv2.LINE_AA)
+            # toe_1_position = aigym.find_point_position(landmarkID["left_heel"], landmark_list)
+            # toe_2_position = aigym.find_point_position(landmarkID["left_foot_index"], landmark_list)
+            # toe_3_position = aigym.find_point_position(landmarkID["right_heel"], landmark_list)
+            # toe_4_position = aigym.find_point_position(landmarkID["right_foot_index"], landmark_list)
+
+            # if toe_1_position > toe_2_position:  # left view
+            #     rect_point_1 = int(toe_1_position[0] * 1.15), toe_1_position[1]
+            #     rect_point_4 = int(toe_2_position[0] * 0.85), 10
+            #     cv2.rectangle(img, rect_point_1, rect_point_4, color_green, 1, cv2.LINE_AA)
+            # else:  # right view
+            #     rect_point_1 = int(toe_3_position[0] * 0.85), toe_3_position[1]
+            #     rect_point_4 = int(toe_4_position[0] * 1.15), 10
+            #     cv2.rectangle(img, rect_point_1, rect_point_4, color_green, 2, cv2.LINE_AA)
 
             # plot_horizontal_column = aigym.plot_bar_horizontal(distance_H, img, thigh_half_length, color_green)
 
@@ -380,6 +388,9 @@ while cap.isOpened():
             #         else:
             #             good_count += 0
 
+            #DRAWING BODY BOUNDING BOX
+            cv2.rectangle(img, (int(body_coordinates["x1"]*0.85),int(body_coordinates["y1"]*1.15)), 
+            (int(body_coordinates["x2"]*1.15),int(body_coordinates["y2"]*0.85)), color_green, 1, cv2.LINE_AA)
 
 
             ## DATASET COLLECTION AND LOGGING
