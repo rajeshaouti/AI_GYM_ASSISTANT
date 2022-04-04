@@ -3,26 +3,48 @@
     "version": "1.0",
     "measurements": [
         {
-            "name": "left_shoulder_length",
-            "type": "euclidean",
+            "name": "left_shoulder_angle",
+            "type": "angle",
             "camera": 0,
             "points": [
-                "left_elbow",
+                "right_shoulder",
                 "left_shoulder",
-                "right_shoulder"
+                "left_elbow"
             ]
         },
         {
-            "name": "left_shoulder_length_0.9",
-            "initial": "left_shoulder_length",
-            "type": "multiply",
-            "value": 0.9
+            "name": "right_shoulder_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "right_elbow",
+                "right_shoulder",
+                "left_shoulder"
+            ]
         },
         {
-            "name": "left_shoulder_length_1.1",
-            "initial": "left_shoulder_length",
+            "name": "right_shoulder_angle_0.8",
+            "initial": "right_shoulder_angle",
+            "type": "multiply",
+            "value": 0.8
+        },
+        {
+            "name": "right_shoulder_angle_1.1",
+            "initial": "right_shoulder_angle",
             "type": "multiply",
             "value": 1.1
+        },
+        {
+            "name": "right_shoulder_angle_0.5",
+            "initial": "right_shoulder_angle",
+            "type": "multiply",
+            "value": 0.5
+        },
+        {
+            "name": "right_shoulder_angle_1.5",
+            "initial": "right_shoulder_angle",
+            "type": "multiply",
+            "value": 1.5
         }
     ],
     "indicators": [
@@ -51,15 +73,20 @@
             }
         },
         {
-            "name": "left_shoulder_length",
-            "type": "relative",
+            "name": "left_shoulder_angle",
             "camera": 0,
+            "type": "relative",
             "good": {
-                "max": "left_shoulder_length"
+                "min": "right_shoulder_angle_0.8",
+                "max": "right_shoulder_angle_1.1"
+                
             },
-            "intermediate": {
-                "min": "left_shoulder_length_0.9",
-                "max": "left_shoulder_length_1.1"
+            "intermediate":{
+                "min": "right_shoulder_angle_0.5",
+                "max": "right_shoulder_angle_1.5"
+            },
+            "bad":{
+                "warning": "Left and right hard are not in coordination."
             }
         }
     ],
@@ -108,17 +135,7 @@
                 "left_shoulder",
                 "left_elbow"
             ],
-            "indicator": -1
-        },
-        {
-            "name": "left_shoulder_length",
-            "type": "line",
-            "camera": 0,
-            "points": [
-                "right_shoulder",
-                "left_shoulder"
-            ],
-            "indicator": 0
+            "indicator": 1
         }
     ]
 }
