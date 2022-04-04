@@ -6,9 +6,9 @@
             "name": "left_shoulder_angle",
             "type": "angle",
             "points": [
-                "left_elbow",
+                "right_shoulder",
                 "left_shoulder",
-                "right_shoulder"
+                "left_elbow"
             ]
         },
         {
@@ -78,8 +78,8 @@
                 
             },
             "intermediate":{
-                "max": "right_shoulder_angle_0.5",
-                "min": "right_shoulder_angle_1.5"
+                "min": "right_shoulder_angle_0.5",
+                "max": "right_shoulder_angle_1.5"
             },
             "bad":{
                 "warning": "Left and right hard are not in coordination."
