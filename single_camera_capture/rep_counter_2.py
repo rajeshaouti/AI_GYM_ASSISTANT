@@ -157,6 +157,11 @@ while cap.isOpened():
         h, w, c = img[0].shape
         landmark_list = [[],[]]
 
+        ind_text_start_x = 25
+        ind_text_start_y = int(h*8/10)
+        ind_box_start_x = 125
+        ind_box_start_y = int(h*8/10)-15
+
         body_coordinates = [
             {"x1":inf,"y1":-inf,"x2":-inf,"y2":inf},
             {"x1":inf,"y1":-inf,"x2":-inf,"y2":inf}
@@ -181,10 +186,10 @@ while cap.isOpened():
             body_coordinates[1]["x2"] = max(cx,body_coordinates[1]["x2"])
             body_coordinates[1]["y2"] = min(cy,body_coordinates[1]["y2"])
         
-        text_start_x = [500,500]
-        text_start_y = [40,40]
-        box_start_x = [600,600]
-        box_start_y = [25,25]
+        text_start_x = [ind_text_start_x,ind_text_start_x]
+        text_start_y = [ind_text_start_y,ind_text_start_y]
+        box_start_x = [ind_box_start_x,ind_box_start_x]
+        box_start_y = [ind_box_start_y,ind_box_start_y]
 
         if (len(landmark_list[0]) != 0) and (len(landmark_list[1]) != 0):
             #PREPROCESSING MEASUREMENTS
