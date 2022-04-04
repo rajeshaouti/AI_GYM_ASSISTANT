@@ -191,7 +191,7 @@ while cap.isOpened():
                         point2 = aigym.find_point_position(point2,landmark_list)
                     measurements[measurement["name"]] = aigym.absolute_distance(point1, point2 ,axis = measurement["axis"])
                 elif measurement["type"] == "angle":
-                    point = aigym.findpositions(landmarkID[indicator["points"][0]], landmarkID[indicator["points"][1]], landmarkID[indicator["points"][2]], landmark_list)
+                    point = aigym.findpositions(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]], landmarkID[measurement["points"][2]], landmark_list)
                     measurements[measurement["name"]] = aigym.calculate_angle(point)
                 elif measurement["type"] == "multiply":
                     measurements[measurement["name"]] = measurements[measurement["initial"]]*measurement["value"]
