@@ -109,6 +109,16 @@
                 "left_elbow"
             ],
             "indicator": -1
+        },
+        {
+            "name": "left_shoulder_length",
+            "type": "line",
+            "camera": 0,
+            "points": [
+                "right_shoulder",
+                "left_shoulder"
+            ],
+            "indicator": 0
         }
     ]
 }

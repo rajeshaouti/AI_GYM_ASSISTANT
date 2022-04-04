@@ -272,7 +272,15 @@ while cap.isOpened():
                     if type(point) == int:
                         point = aigym.find_point_position(point1,landmark_list)
                     aigym.plot_point(point, indicator_colors[indicator_status[plot["indicator"]]], img)
-
+                
+                elif plot["type"] == "line":
+                    point0 = landmarkID[plot["points"][0]]
+                    if type(point0) == int:
+                        point0 = aigym.find_point_position(point0,landmark_list)
+                    point1 = landmarkID[plot["points"][1]]
+                    if type(point1) == int:
+                        point1 = aigym.find_point_position(point1,landmark_list)
+                    aigym.plot_lines_2_points(point0,point1, indicator_colors[indicator_status[plot["indicator"]]], img)
 
 
 

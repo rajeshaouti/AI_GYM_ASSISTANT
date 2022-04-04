@@ -294,6 +294,15 @@ while cap.isOpened():
                     if type(point) == int:
                         point = aigym.find_point_position(point1,landmark_list[indicator["camera"]])
                     aigym.plot_point(point, indicator_colors[indicator_status[plot["indicator"]]], img[plot["camera"]])
+                
+                elif plot["type"] == "line":
+                    point0 = landmarkID[plot["points"][0]]
+                    if type(point0) == int:
+                        point0 = aigym.find_point_position(point0,landmark_list[indicator["camera"]])
+                    point1 = landmarkID[plot["points"][1]]
+                    if type(point1) == int:
+                        point1 = aigym.find_point_position(point1,landmark_list[indicator["camera"]])
+                    aigym.plot_lines_2_points(point0,point1, indicator_colors[indicator_status[plot["indicator"]]], img[plot["camera"]])
             
             #DRAWING BODY BOUNDING BOX
             cv2.rectangle(img[0], (int(body_coordinates[0]["x1"]*0.85),int(body_coordinates[0]["y1"]*1.15)), 

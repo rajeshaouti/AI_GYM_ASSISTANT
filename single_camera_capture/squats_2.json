@@ -67,6 +67,7 @@
         {
             "name": "angle_back",
             "type": "angle",
+            "camera": 0,
             "points": [
                 "left_shoulder",
                 "left_hip",
@@ -90,6 +91,7 @@
         {
             "name": "toe_knee_length",
             "type": "relative",
+            "camera": 0,
             "good": {
                 "max": "foot_length_1.1"
             },
@@ -103,6 +105,7 @@
         {
             "name": "ear_thighcentroid_length",
             "type": "relative",
+            "camera": 0,
             "good": {
                 "max": "thigh_half_length"
             },
@@ -115,6 +118,7 @@
         {
             "name": "knee_angle",
             "type": "angle",
+            "camera": 0,
             "points": [
                 "left_hip",
                 "left_knee",
@@ -125,6 +129,7 @@
         {
             "name": "knee_angle",
             "type": "angle",
+            "camera": 0,
             "points": [
                 "left_hip",
                 "left_knee",
@@ -137,6 +142,7 @@
         {
             "name": "knee",
             "type": "angle",
+            "camera": 0,
             "points": [
                 "left_hip",
                 "left_knee",
@@ -146,15 +152,27 @@
         },
         {
             "name": "thigh_centroid",
+            "camera": 0,
             "type": "point",
             "measurement": "thigh_centroid",
             "indicator": 1
         },
         {
             "name": "knee",
+            "camera": 0,
             "type": "point",
             "point": "left_ear",
             "indicator": 2
+        },
+        {
+            "name": "shoulder_length",
+            "camera": 1,
+            "type": "line",
+            "points": [
+                "left_shoulder",
+                "right_shoulder"
+            ],
+            "indicator": -1
         }
     ]
 }

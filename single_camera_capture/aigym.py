@@ -50,6 +50,11 @@ def plot_lines_3points(pt1, pt2, pt3,img):
     points = np.array([(pt1), pt2, (pt3)])
     cv2.drawContours(img, [points], 0, (255, 255, 255), 2)
 
+def plot_lines_2_points(pt1, pt2, color,img):
+    cv2.line(img, pt1, pt2, color, 2)
+    cv2.circle(img, pt1, 2, color, cv2.FILLED)
+    cv2.circle(img, pt2, 2, color, cv2.FILLED)
+
 
 def plot(point, color,angle,img):
     cv2.line(img, point[0], point[1], color, 2)
