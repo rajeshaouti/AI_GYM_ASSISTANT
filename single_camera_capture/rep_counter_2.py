@@ -210,6 +210,9 @@ while cap.isOpened():
                     if type(point2) == int:
                         point2 = aigym.find_point_position(point2,landmark_list[measurement["camera"]])
                     measurements[measurement["name"]] = aigym.absolute_distance(point1, point2 ,axis = measurement["axis"])
+                elif measurement["type"] == "angle":
+                    point = aigym.findpositions(landmarkID[indicator["points"][0]], landmarkID[indicator["points"][1]], landmarkID[indicator["points"][2]], landmark_list[indicator["camera"]])
+                    measurements[measurement["name"]] = aigym.calculate_angle(point)
                 elif measurement["type"] == "multiply":
                     measurements[measurement["name"]] = measurements[measurement["initial"]]*measurement["value"]
                 elif measurement["type"] == "centroid":
