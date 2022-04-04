@@ -17,9 +17,9 @@ def calculate_angle(p):
     x3, y3 = p[2]
     deg1 = round((360 + np.degrees(np.arctan2(x1 - x2, y1 - y2))) % 360)
     deg2 = round((360 + np.degrees(np.arctan2(x3 - x2, y3 - y2))) % 360)
-    # return deg2 - deg1 if deg1 <= deg2 else 360 - (deg1 - deg2)
-    sub = abs(deg2 - deg1)
-    return min(sub,360 - sub)
+    return deg2 - deg1 if deg1 <= deg2 else 360 - (deg1 - deg2)
+    # sub = abs(deg2 - deg1)
+    # return min(sub,360 - sub)
 
 
 def find_point_position(id,landmark_list):
