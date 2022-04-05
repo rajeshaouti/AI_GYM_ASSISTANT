@@ -151,9 +151,9 @@ while cap.isOpened():
         h, w, c = img.shape
         landmark_list = []
 
-        ind_text_start_x = 25
+        ind_text_start_x = 55
         ind_text_start_y = int(h*8/10)
-        ind_box_start_x = 125
+        ind_box_start_x = 25
         ind_box_start_y = int(h*8/10)-15
 
         body_coordinates = {"x1":inf,"y1":-inf,"x2":-inf,"y2":inf}

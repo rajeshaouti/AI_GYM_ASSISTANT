@@ -50,9 +50,16 @@ print("LOADING EXERCISE: "+exercise["name"])
 print("VERSION: "+exercise["version"])
 
 # mediapipe module
-mpDraw = mp.solutions.drawing_utils
-mpPose = mp.solutions.pose
-pose = mpPose.Pose()
+pose = []
+mpDraw1 = mp.solutions.drawing_utils
+mpPose1 = mp.solutions.pose
+pose1 = mpPose1.Pose()
+pose.append(pose1)
+
+mpDraw2 = mp.solutions.drawing_utils
+mpPose2 = mp.solutions.pose
+pose2 = mpPose2.Pose()
+pose.append(pose2)
 
 # Tracking the detected marker
 tracker = cv2.TrackerCSRT_create()
@@ -149,17 +156,17 @@ while cap.isOpened():
     imgRGB = cv2.cvtColor(img[0], cv2.COLOR_BGR2RGB)
     imgRGB1 = cv2.cvtColor(img[1], cv2.COLOR_BGR2RGB)
     results = []
-    results.append(pose.process(imgRGB))
-    results.append(pose.process(imgRGB1))
+    results.append(pose[0].process(imgRGB))
+    results.append(pose[1].process(imgRGB1))
 
     #detecting only if pose landmarks are present
     if results[0].pose_landmarks and results[1].pose_landmarks:
         h, w, c = img[0].shape
         landmark_list = [[],[]]
 
-        ind_text_start_x = 25
+        ind_text_start_x = 55
         ind_text_start_y = int(h*8/10)
-        ind_box_start_x = 125
+        ind_box_start_x = 25
         ind_box_start_y = int(h*8/10)-15
 
         body_coordinates = [
