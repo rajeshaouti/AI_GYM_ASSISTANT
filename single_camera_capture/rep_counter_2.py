@@ -217,6 +217,11 @@ while cap.isOpened():
                     if type(point2) == int:
                         point2 = aigym.find_point_position(point2,landmark_list[measurement["camera"]])
                     measurements[measurement["name"]] = aigym.absolute_distance(point1, point2 ,axis = measurement["axis"])
+                elif measurement["type"] == "diff":
+                    diff = measurement["measurements"][0] - measurement["measurements"][1]
+                    if measurement["abs"]:
+                        diff = abs(diff)
+                    measurements[measurement["name"]] = diff
                 elif measurement["type"] == "angle":
                     point = aigym.findpositions(landmarkID[measurement["points"][0]], landmarkID[measurement["points"][1]], landmarkID[measurement["points"][2]], landmark_list[measurement["camera"]])
                     measurements[measurement["name"]] = aigym.calculate_angle(point)

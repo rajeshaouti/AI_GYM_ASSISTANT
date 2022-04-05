@@ -61,6 +61,47 @@
                 "left_ear",
                 "thigh_centroid"
             ]
+        },
+        {
+            "name": "shoulder_length",
+            "type": "absolute",
+            "axis": 0,
+            "camera": 1,
+            "points": [
+                "left_shoulder",
+                "right_shoulder"
+            ]
+        },
+        {
+            "name": "ankle_length",
+            "type": "absolute",
+            "camera": 1,
+            "axis": 0,
+            "points": [
+                "left_ankle",
+                "right_ankle"
+            ]
+        },
+        {
+            "name": "stance_length",
+            "type": "diff",
+            "abs": true,
+            "measurements": [
+                "ankle_length",
+                "shoulder_length"
+            ]
+        },
+        {
+            "name": "shoulder_length_0.1",
+            "initial": "shoulder_length",
+            "type": "multiply",
+            "value": 0.1
+        },
+        {
+            "name": "shoulder_length_0.3",
+            "initial": "shoulder_length",
+            "type": "multiply",
+            "value": 0.3
         }
     ],
     "indicators": [
@@ -111,6 +152,17 @@
             },
             "intermediate": {
                 "max": "thigh_half_length_1.3"
+            }
+        },
+        {
+            "name": "stance_length",
+            "type": "relative",
+            "camera": 0,
+            "good": {
+                "max": "shoulder_length_0.1"
+            },
+            "intermediate": {
+                "max": "shoulder_length_0.3"
             }
         }
     ],
@@ -172,7 +224,17 @@
                 "left_shoulder",
                 "right_shoulder"
             ],
-            "indicator": -1
+            "indicator": 3
+        },
+        {
+            "name": "ankle_length",
+            "camera": 1,
+            "type": "line",
+            "points": [
+                "left_ankle",
+                "right_ankle"
+            ],
+            "indicator": 3
         }
     ]
 }

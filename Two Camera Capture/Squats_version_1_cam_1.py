@@ -78,11 +78,11 @@ while cap.isOpened():
 
         if len(lmlist) != 0:
             # Shoulder Stance
-            point_shoulder_1 = find_point_position(12, lmlist)
-            point_shoulder_2 = find_point_position(11, lmlist)
+            point_shoulder_1 = find_point_position(12, lmlist)#right_shoulder
+            point_shoulder_2 = find_point_position(11, lmlist)#left_shoulder
 
-            point_ankle_1 = find_point_position(28, lmlist)
-            point_ankle_2 = find_point_position(27, lmlist)
+            point_ankle_1 = find_point_position(28, lmlist)#right_ankle
+            point_ankle_2 = find_point_position(27, lmlist)#left_ankle
 
             shoulder_width = abs(point_shoulder_1[0] - point_shoulder_2[0])
             ankle_width = abs(point_ankle_1[0] - point_ankle_2[0])
