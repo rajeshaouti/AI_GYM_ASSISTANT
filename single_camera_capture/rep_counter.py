@@ -33,7 +33,11 @@ direction = 0
 count = 0
 point_no = []
 
-EXERCISE = "lat_pull.json"
+EXERCISE = "squats.json"
+CAMERA_0 = "resize_L3T.mov"
+
+# EXERCISE = "lat_pull.json"
+# CAMERA_0 = "resize_latpull_back.mp4"
 
 landmarkID = json.loads(open("mediapipe_landmarks.json").read())
 exercise = json.loads(open(EXERCISE).read())
@@ -58,7 +62,7 @@ pose = mpPose.Pose()
 tracker = cv2.TrackerCSRT_create()
 
 # Capture the video feed
-cap = cv2.VideoCapture("resize_latpull_back.mp4")
+cap = cv2.VideoCapture(CAMERA_0)
 
 # Run the code for plotting aruco
 _thread.start_new_thread(aigym.graph_plot, ())

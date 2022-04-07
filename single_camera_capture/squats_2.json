@@ -197,6 +197,17 @@
     ],
     "plot": [
         {
+            "name": "angle_back",
+            "type": "angle",
+            "camera": 1,
+            "points": [
+                "left_shoulder",
+                "left_hip",
+                "left_knee"
+            ],
+            "indicator": -1
+        },
+        {
             "name": "knee",
             "type": "angle",
             "camera": 0,

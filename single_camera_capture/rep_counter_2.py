@@ -11,7 +11,7 @@ import os
 from itertools import count
 import numpy as np
 import json
-
+import threading
 import aigym
 
 ## AruCo Tracking
@@ -67,6 +67,29 @@ mpPose2 = mp.solutions.pose
 pose2 = mpPose2.Pose()
 pose.append(pose2)
 
+class PoseLandmarks:
+    pose = 0
+    def __init__(self):
+        self.self = self
+        mpDraw = mp.solutions.drawing_utils
+        mpPose = mp.solutions.pose
+        self.pose = mpPose.Pose()
+    def findLandmarks(self,results,cam,imgRGB):
+        try:
+            results[cam] = self.pose.process(imgRGB)
+        except Exception as e:
+            print("thread:",e)
+
+def findLandmarks(pose,results,cam,imgRGB):
+        try:
+            results[cam] = pose.process(imgRGB)
+        except e:
+            print("thread:",e)
+
+pose = []
+pose.append(PoseLandmarks())
+pose.append(PoseLandmarks())
+
 # Tracking the detected marker
 tracker = cv2.TrackerCSRT_create()
 
@@ -82,6 +105,7 @@ num_coord = 33
 landmarks = ["Point_no", "B_X0", "B_Y0"]
 for val in range(1, num_coord + 1):
     landmarks += [f'x{val}', f'y{val}']
+
 
 ## ARUCO MARKER
 if TRACK_ARUCO:
@@ -161,9 +185,20 @@ while cap.isOpened():
 
     imgRGB = cv2.cvtColor(img[0], cv2.COLOR_BGR2RGB)
     imgRGB1 = cv2.cvtColor(img[1], cv2.COLOR_BGR2RGB)
-    results = []
-    results.append(pose[0].process(imgRGB))
-    results.append(pose[1].process(imgRGB1))
+    results = [0,0]
+    t1 = threading.Thread(target=pose[0].findLandmarks, args=(results,0,imgRGB))
+    t2 = threading.Thread(target=pose[1].findLandmarks, args=(results,1,imgRGB1))
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+    # print(results)
+    # exit()
+    # results = []
+    # results.append(pose[0].process(imgRGB))
+    # results.append(pose[1].process(imgRGB1))
 
     #detecting only if pose landmarks are present
     if results[0].pose_landmarks and results[1].pose_landmarks:
@@ -189,7 +224,7 @@ while cap.isOpened():
             body_coordinates[0]["x2"] = max(cx,body_coordinates[0]["x2"])
             body_coordinates[0]["y2"] = min(cy,body_coordinates[0]["y2"])
 
-        
+        h, w, c = img[1].shape
         #landmark for camera 1
         for id, lm in enumerate(results[1].pose_landmarks.landmark):
             cx, cy = int(lm.x * w), int(lm.y * h)
