@@ -33,7 +33,13 @@ direction = 0
 count = 0
 point_no = []
 
-EXERCISE = "lat_pull_2.json"
+EXERCISE = "squats_2.json"
+CAMERA_0 = "resize_L3S.mov"
+CAMERA_1 = "resize_L3T.mov"
+
+# EXERCISE = "lat_pull_2.json"
+# CAMERA_0 = "resize_latpull_back.mp4"
+# CAMERA_1 = "resize_latpull_side.mp4"
 
 landmarkID = json.loads(open("mediapipe_landmarks.json").read())
 exercise = json.loads(open(EXERCISE).read())
@@ -65,8 +71,8 @@ pose.append(pose2)
 tracker = cv2.TrackerCSRT_create()
 
 # Capture the video feed
-cap = cv2.VideoCapture("resize_latpull_back.mp4")
-cap2 = cv2.VideoCapture("resize_latpull_side.mp4")
+cap = cv2.VideoCapture(CAMERA_0)
+cap2 = cv2.VideoCapture(CAMERA_1)
 
 # Run the code for plotting aruco
 _thread.start_new_thread(aigym.graph_plot, ())
@@ -218,7 +224,7 @@ while cap.isOpened():
                         point2 = aigym.find_point_position(point2,landmark_list[measurement["camera"]])
                     measurements[measurement["name"]] = aigym.absolute_distance(point1, point2 ,axis = measurement["axis"])
                 elif measurement["type"] == "diff":
-                    diff = measurement["measurements"][0] - measurement["measurements"][1]
+                    diff = measurements[measurement["measurements"][0]] - measurements[measurement["measurements"][1]]
                     if measurement["abs"]:
                         diff = abs(diff)
                     measurements[measurement["name"]] = diff
@@ -300,23 +306,26 @@ while cap.isOpened():
             ##ADDITIONAL PLOTTING
             for plot in exercise["plot"]:
                 if plot["type"] == "angle":
-                    point = aigym.findpositions(landmarkID[plot["points"][0]], landmarkID[plot["points"][1]], landmarkID[plot["points"][2]], landmark_list[indicator["camera"]])
+                    point = aigym.findpositions(landmarkID[plot["points"][0]], landmarkID[plot["points"][1]], landmarkID[plot["points"][2]], landmark_list[plot["camera"]])
                     angle = aigym.calculate_angle(point)
                     aigym.plot(point, indicator_colors[indicator_status[plot["indicator"]]], angle, img[plot["camera"]])
                 
                 elif plot["type"] == "point":
-                    point = landmarkID[measurement["points"][1]]
+                    if "point" in plot:
+                        point = landmarkID[plot["point"]]
+                    else:
+                        point = landmarkID[plot["measurement"]]
                     if type(point) == int:
-                        point = aigym.find_point_position(point1,landmark_list[indicator["camera"]])
+                        point = aigym.find_point_position(point,landmark_list[plot["camera"]])
                     aigym.plot_point(point, indicator_colors[indicator_status[plot["indicator"]]], img[plot["camera"]])
                 
                 elif plot["type"] == "line":
                     point0 = landmarkID[plot["points"][0]]
                     if type(point0) == int:
-                        point0 = aigym.find_point_position(point0,landmark_list[indicator["camera"]])
+                        point0 = aigym.find_point_position(point0,landmark_list[plot["camera"]])
                     point1 = landmarkID[plot["points"][1]]
                     if type(point1) == int:
-                        point1 = aigym.find_point_position(point1,landmark_list[indicator["camera"]])
+                        point1 = aigym.find_point_position(point1,landmark_list[plot["camera"]])
                     aigym.plot_lines_2_points(point0,point1, indicator_colors[indicator_status[plot["indicator"]]], img[plot["camera"]])
             
             #DRAWING BODY BOUNDING BOX

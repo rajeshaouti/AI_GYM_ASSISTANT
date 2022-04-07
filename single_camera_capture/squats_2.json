@@ -5,6 +5,7 @@
         {
             "name": "foot_length",
             "type": "euclidean",
+            "camera": 0,
             "points": [
                 "left_ankle",
                 "left_foot_index"
@@ -26,6 +27,7 @@
             "name": "toe_knee_length",
             "type": "absolute",
             "axis": 0,
+            "camera": 0,
             "points": [
                 "left_knee",
                 "left_foot_index"
@@ -34,6 +36,7 @@
         {
             "name": "thigh_centroid",
             "type": "centroid",
+            "camera": 0,
             "points": [
                 "left_hip",
                 "left_knee"
@@ -42,6 +45,7 @@
         {
             "name": "thigh_half_length",
             "type": "euclidean",
+            "camera": 0,
             "points": [
                 "left_hip",
                 "thigh_centroid"
@@ -56,6 +60,7 @@
         {
             "name": "ear_thighcentroid_length",
             "type": "absolute",
+            "camera": 0,
             "axis": 0,
             "points": [
                 "left_ear",
@@ -157,7 +162,7 @@
         {
             "name": "stance_length",
             "type": "relative",
-            "camera": 0,
+            "camera": 1,
             "good": {
                 "max": "shoulder_length_0.1"
             },

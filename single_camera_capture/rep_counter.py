@@ -191,7 +191,7 @@ while cap.isOpened():
                         point2 = aigym.find_point_position(point2,landmark_list)
                     measurements[measurement["name"]] = aigym.absolute_distance(point1, point2 ,axis = measurement["axis"])
                 elif measurement["type"] == "diff":
-                    diff = measurement["measurements"][0] - measurement["measurements"][1]
+                    diff = measurements[measurement["measurements"][0]] - measurements[measurement["measurements"][1]]
                     if measurement["abs"]:
                         diff = abs(diff)
                     measurements[measurement["name"]] = diff
