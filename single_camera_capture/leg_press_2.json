@@ -80,30 +80,6 @@
             }
         },
         {
-            "name": "angle_knee",
-            "type": "angle",
-            "camera": 1,
-            "points": [
-                "left_hip",
-                "left_knee",
-                "left_ankle"
-            ],
-            "plot": true,
-            "good": {
-                "min": 200,
-                "max": 290
-            },
-            "intermediate": {
-                "min": 190,
-                "max": 300
-            },
-            "bad": {
-                "min": 10,
-                "max": 360,
-                "warning": "Back angle too high"
-            }
-        },
-        {
             "name": "knee_length",
             "type": "relative",
             "camera": 0,
@@ -152,14 +128,45 @@
     ],
     "plot": [
         {
-            "name": "foot",
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 1,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "indicator": -1
+        },
+        {
+            "name": "foot_length",
             "type": "line",
             "camera": 0,
             "points": [
                 "right_foot_index",
                 "left_foot_index"
             ],
-            "indicator": -1
+            "indicator": 2
+        },
+        {
+            "name": "knee_length",
+            "type": "line",
+            "camera": 0,
+            "points": [
+                "left_knee",
+                "right_knee"
+            ],
+            "indicator": 1
+        },
+        {
+            "name": "shoulder_length",
+            "type": "line",
+            "camera": 0,
+            "points": [
+                "left_shoulder",
+                "right_shoulder"
+            ],
+            "indicator": 2
         }
     ]
 }

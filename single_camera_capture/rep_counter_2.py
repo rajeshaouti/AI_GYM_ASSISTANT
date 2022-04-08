@@ -33,9 +33,9 @@ direction = 0
 count = 0
 point_no = []
 
-EXERCISE = "squats_2.json"
-CAMERA_0 = "resize_L3S.mov"
-CAMERA_1 = "resize_L3T.mov"
+EXERCISE = "leg_press_2.json"
+CAMERA_0 = "resize_L3T.mov"
+CAMERA_1 = "resize_L3S.mov"
 
 # EXERCISE = "lat_pull_2.json"
 # CAMERA_0 = "resize_latpull_back.mp4"
@@ -328,7 +328,7 @@ while cap.isOpened():
             ##COUNTING REPS
             sequence = exercise["sequence"][present_sequence]
             if sequence["type"] == "angle":
-                point = aigym.findpositions(landmarkID[sequence["points"][0]], landmarkID[sequence["points"][1]], landmarkID[sequence["points"][2]], landmark_list[indicator["camera"]])
+                point = aigym.findpositions(landmarkID[sequence["points"][0]], landmarkID[sequence["points"][1]], landmarkID[sequence["points"][2]], landmark_list[sequence["camera"]])
                 angle = aigym.calculate_angle(point)
                 if angle <sequence.get("max",inf) and angle > sequence.get("min",-inf):
                     present_sequence = (present_sequence+1)%total_sequences_length

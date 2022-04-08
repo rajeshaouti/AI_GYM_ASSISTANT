@@ -33,8 +33,11 @@ direction = 0
 count = 0
 point_no = []
 
-EXERCISE = "squats.json"
-CAMERA_0 = "resize_L3T.mov"
+EXERCISE = "leg_extension.json"
+CAMERA_0 = "resize_leg_extension.mp4"
+
+# EXERCISE = "squats.json"
+# CAMERA_0 = "resize_L3T.mov"
 
 # EXERCISE = "lat_pull.json"
 # CAMERA_0 = "resize_latpull_back.mp4"
