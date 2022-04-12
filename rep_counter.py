@@ -34,7 +34,8 @@ direction = 0
 count = 0
 point_no = []
 
-EXERCISE = "leg_extension.json"
+EXERCISE_NAME = "leg_extension.json"
+EXERCISE = os.path.join("exercises_1",EXERCISE_NAME)
 CAMERA_0 = "resize_leg_extension.mp4"
 
 # EXERCISE = "squats.json"
