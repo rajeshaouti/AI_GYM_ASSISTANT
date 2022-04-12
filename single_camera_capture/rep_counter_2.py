@@ -12,6 +12,8 @@ from itertools import count
 import numpy as np
 import json
 import threading
+import pandas as pd
+
 import aigym
 
 ## AruCo Tracking
@@ -34,8 +36,8 @@ count = 0
 point_no = []
 
 EXERCISE = "leg_press_2.json"
-CAMERA_0 = "resize_L3T.mov"
-CAMERA_1 = "resize_L3S.mov"
+CAMERA_0 = "resize_L3_T.mov"
+CAMERA_1 = "resize_L3_S.mov"
 
 # EXERCISE = "lat_pull_2.json"
 # CAMERA_0 = "resize_latpull_back.mp4"
@@ -54,6 +56,26 @@ rep_count = 0
 
 print("LOADING EXERCISE: "+exercise["name"])
 print("VERSION: "+exercise["version"])
+
+#GENERATING COLUMNS
+columns = []
+temp_columns = [(landmarkID[i],i) for i in landmarkID]
+temp_columns.sort()
+for col in temp_columns:
+    columns.append(col[1]+"_1"+"_x")
+    columns.append(col[1]+"_1"+"_y")
+    columns.append(col[1]+"_1"+"_z")
+    columns.append(col[1]+"_1"+"_v")
+for col in temp_columns:
+    columns.append(col[1]+"_2"+"_x")
+    columns.append(col[1]+"_2"+"_y")
+    columns.append(col[1]+"_2"+"_z")
+    columns.append(col[1]+"_2"+"_v")
+
+for indicator in exercise["indicators"]:
+    columns.append(indicator["name"])
+
+columns.append("sequence")
 
 # mediapipe module
 pose = []
@@ -130,6 +152,7 @@ if TRACK_ARUCO:
         cv2.waitKey(30)
     cv2.destroyAllWindows()
 
+data = []
 
 #Detecting and tracking the marker
 while cap.isOpened():
@@ -142,8 +165,12 @@ while cap.isOpened():
             pass
     
     #Updating the camera feed
-    ok, img1 = cap.read()
-    ok, img2 = cap2.read()
+    ok1, img1 = cap.read()
+    ok2, img2 = cap2.read()
+
+    if not (ok1 and ok2):
+        break
+
     img = [img1,img2]
 
     timer = cv2.getTickCount()
@@ -240,6 +267,7 @@ while cap.isOpened():
         box_start_y = [ind_box_start_y,ind_box_start_y]
 
         if (len(landmark_list[0]) != 0) and (len(landmark_list[1]) != 0):
+            warning = "\n"
             #PREPROCESSING MEASUREMENTS
             for measurement in exercise["measurements"]:
                 if measurement["type"] == "euclidean":
@@ -283,15 +311,18 @@ while cap.isOpened():
                         if angle <=indicator["good"].get("max",inf) and angle >= indicator["good"].get("min",-inf):
                             status = 0
                             box_color = color_green
+                            warning += indicator["good"].get("warning",indicator["name"]+" good")+"\n"
                     
                     if status == -1 and ("intermediate" in indicator):
                         if angle <=indicator["intermediate"].get("max",inf) and angle >= indicator["intermediate"].get("min",-inf):
                             status = 1
                             box_color = color_yellow
+                            warning += indicator["intermediate"].get("warning",indicator["name"]+" average")+"\n"
                     
                     if status == -1:
                         status = 2
                         box_color = color_red
+                        warning += indicator["bad"].get("warning",indicator["name"]+" bad")+"\n"
                     
                     plot1 = aigym.plot(point, box_color, angle, img[indicator["camera"]])
                 
@@ -303,15 +334,18 @@ while cap.isOpened():
                         if attribute <=measurements[indicator["good"].get("max","inf")] and attribute >= measurements[indicator["good"].get("min","-inf")]:
                             status = 0
                             box_color = color_green
+                            warning += indicator["good"].get("warning",indicator["name"]+" good")+"\n"
                     
                     if status == -1 and ("intermediate" in indicator):
                         if attribute <=measurements[indicator["intermediate"].get("max","inf")] and attribute >= measurements[indicator["intermediate"].get("min","-inf")]:
                             status = 1
                             box_color = color_yellow
+                            warning += indicator["intermediate"].get("warning",indicator["name"]+" average")+"\n"
                     
                     if status == -1:
                         status = 2
                         box_color = color_red
+                        warning += indicator["bad"].get("warning",indicator["name"]+" bad")+"\n"
                     
 
                     
@@ -336,7 +370,7 @@ while cap.isOpened():
                     if 2 not in indicator_status:
                         good_rep_count+=0.5
             
-            print("rep_count",rep_count,"good_rep_count",good_rep_count,indicator_status,angle,present_sequence)
+            print("rep_count",rep_count,"good_rep_count",good_rep_count,indicator_status,present_sequence,warning)
             
             ##ADDITIONAL PLOTTING
             for plot in exercise["plot"]:
@@ -371,11 +405,18 @@ while cap.isOpened():
             (int(body_coordinates[1]["x2"]*1.15),int(body_coordinates[1]["y2"]*0.85)), color_green, 1, cv2.LINE_AA)
 
 
-            ## DATASET COLLECTION AND LOGGING FROM CAMERA 0
-            pose1 = results[0].pose_landmarks.landmark
-            pose_data = list(
-                np.array([[int((landmark.x) * w), int((landmark.y) * h)] for landmark in pose1]).flatten())
-            
+            ## DATASET COLLECTION AND LOGGING FROM CAMERA
+            pose_data = []
+            for camera_id in range(2):
+                pose_results = results[camera_id].pose_landmarks.landmark
+                # pose_data = list(np.array([[int((landmark.x) * w), int((landmark.y) * h)] for landmark in pose1]).flatten()
+                for landmark in pose_results:
+                    pose_data.extend([landmark.x,landmark.y,landmark.z,landmark.visibility])
+                
+            pose_data.extend(indicator_status[:-1])
+            pose_data.extend([present_sequence])
+            data.append(np.array(pose_data))
+
             ## ARUCO MARKER
             if TRACK_ARUCO:
                 dumbel_data = list(np.array([centroid_tracking[0], centroid_tracking[1]]))
@@ -411,3 +452,6 @@ while cap.isOpened():
         break
 cap.release()
 cv2.destroyAllWindows()
+data = np.array(data)
+data = pd.DataFrame(data,columns = columns)
+data.to_csv("_".join(CAMERA_0.split("_")[:-1])+"_data.csv",index=False)

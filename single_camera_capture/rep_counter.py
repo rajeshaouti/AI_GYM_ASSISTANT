@@ -11,6 +11,7 @@ import os
 from itertools import count
 import numpy as np
 import json
+import pandas as pd
 
 import aigym
 
@@ -56,6 +57,21 @@ rep_count = 0
 print("LOADING EXERCISE: "+exercise["name"])
 print("VERSION: "+exercise["version"])
 
+#GENERATING COLUMNS
+columns = []
+temp_columns = [(landmarkID[i],i) for i in landmarkID]
+temp_columns.sort()
+for col in temp_columns:
+    columns.append(col[1]+"_x")
+    columns.append(col[1]+"_y")
+    columns.append(col[1]+"_z")
+    columns.append(col[1]+"_v")
+
+for indicator in exercise["indicators"]:
+    columns.append(indicator["name"])
+
+columns.append("sequence")
+
 # mediapipe module
 mpDraw = mp.solutions.drawing_utils
 mpPose = mp.solutions.pose
@@ -99,6 +115,7 @@ if TRACK_ARUCO:
         cv2.waitKey(30)
     cv2.destroyAllWindows()
 
+data = []
 
 #Detecting and tracking the marker
 while cap.isOpened():
@@ -112,6 +129,8 @@ while cap.isOpened():
     
     #Updating the camera feed
     ok, img = cap.read()
+    if not ok:
+        break
 
     timer = cv2.getTickCount()
 
@@ -179,6 +198,7 @@ while cap.isOpened():
         box_start_y = ind_box_start_y
 
         if len(landmark_list) != 0:
+            warning = "\n"
             #PREPROCESSING MEASUREMENTS
             for measurement in exercise["measurements"]:
                 if measurement["type"] == "euclidean":
@@ -222,15 +242,18 @@ while cap.isOpened():
                         if angle <=indicator["good"].get("max",inf) and angle >= indicator["good"].get("min",-inf):
                             status = 0
                             box_color = color_green
+                            warning += indicator["good"].get("warning",indicator["name"]+" good")+"\n"
                     
                     if status == -1 and ("intermediate" in indicator):
                         if angle <=indicator["intermediate"].get("max",inf) and angle >= indicator["intermediate"].get("min",-inf):
                             status = 1
                             box_color = color_yellow
+                            warning += indicator["intermediate"].get("warning",indicator["name"]+" average")+"\n"
                     
                     if status == -1:
                         status = 2
                         box_color = color_red
+                        warning += indicator["bad"].get("warning",indicator["name"]+" bad")+"\n"
                     
                     plot1 = aigym.plot(point, box_color, angle, img)
                 
@@ -242,15 +265,18 @@ while cap.isOpened():
                         if attribute <=measurements[indicator["good"].get("max","inf")] and attribute >= measurements[indicator["good"].get("min","-inf")]:
                             status = 0
                             box_color = color_green
+                            warning += indicator["good"].get("warning",indicator["name"]+" good")+"\n"
                     
                     if status == -1 and ("intermediate" in indicator):
                         if attribute <=measurements[indicator["intermediate"].get("max","inf")] and attribute >= measurements[indicator["intermediate"].get("min","-inf")]:
                             status = 1
                             box_color = color_yellow
+                            warning += indicator["intermediate"].get("warning",indicator["name"]+" average")+"\n"
                     
                     if status == -1:
                         status = 2
                         box_color = color_red
+                        warning += indicator["bad"].get("warning",indicator["name"]+" bad")+"\n"
                     
 
                     
@@ -273,7 +299,7 @@ while cap.isOpened():
                     if 2 not in indicator_status:
                         good_rep_count+=0.5
             
-            print("rep_count",rep_count,"good_rep_count",good_rep_count,indicator_status,angle,present_sequence)
+            print("rep_count",rep_count,"good_rep_count",good_rep_count,indicator_status,present_sequence,warning)
             
             ##ADDITIONAL PLOTTING
             for plot in exercise["plot"]:
@@ -422,9 +448,15 @@ while cap.isOpened():
 
 
             ## DATASET COLLECTION AND LOGGING
-            pose1 = results.pose_landmarks.landmark
-            pose_data = list(
-                np.array([[int((landmark.x) * w), int((landmark.y) * h)] for landmark in pose1]).flatten())
+            pose_results = results.pose_landmarks.landmark
+            # pose_data = list(np.array([[int((landmark.x) * w), int((landmark.y) * h)] for landmark in pose1]).flatten())
+            pose_data = []
+            for landmark in pose_results:
+                pose_data.extend([landmark.x,landmark.y,landmark.z,landmark.visibility])
+            
+            pose_data.extend(indicator_status[:-1])
+            pose_data.extend([present_sequence])
+            data.append(np.array(pose_data))
             
             ## ARUCO MARKER
             if TRACK_ARUCO:
@@ -460,3 +492,6 @@ while cap.isOpened():
         break
 cap.release()
 cv2.destroyAllWindows()
+data = np.array(data)
+data = pd.DataFrame(data,columns = columns)
+data.to_csv(CAMERA_0.split(".")[0]+"_data.csv",index=False)
