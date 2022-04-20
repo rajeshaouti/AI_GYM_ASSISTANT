@@ -60,7 +60,7 @@
             "plot": true,
             "good": {
                 "min": 110,
-                "max": 180
+                "max": 240
             },
             "intermediate": {
                 "min": 90,
@@ -111,7 +111,7 @@
                 "right_shoulder",
                 "left_shoulder"
             ],
-            "max": 131
+            "max": 140
         }
     ],
     "plot": [
