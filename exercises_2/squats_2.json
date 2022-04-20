@@ -183,87 +183,88 @@
             "bad": {
                 "warning": " adjust you leg to sholder length.Feet and Shoulders should be parallel"
             }
-        ],
-        "sequence": [
-            {
-                "name": "knee_angle",
-                "type": "angle",
-                "camera": 0,
-                "points": [
-                    "left_hip",
-                    "left_knee",
-                    "left_ankle"
-                ],
-                "max": 190
-            },
-            {
-                "name": "knee_angle",
-                "type": "angle",
-                "camera": 0,
-                "points": [
-                    "left_hip",
-                    "left_knee",
-                    "left_ankle"
-                ],
-                "min": 270
-            }
-        ],
-        "plot": [
-            {
-                "name": "angle_back",
-                "type": "angle",
-                "camera": 1,
-                "points": [
-                    "left_shoulder",
-                    "left_hip",
-                    "left_knee"
-                ],
-                "indicator": -1
-            },
-            {
-                "name": "knee",
-                "type": "angle",
-                "camera": 0,
-                "points": [
-                    "left_hip",
-                    "left_knee",
-                    "left_ankle"
-                ],
-                "indicator": 0
-            },
-            {
-                "name": "thigh_centroid",
-                "camera": 0,
-                "type": "point",
-                "measurement": "thigh_centroid",
-                "indicator": 1
-            },
-            {
-                "name": "knee",
-                "camera": 0,
-                "type": "point",
-                "point": "left_ear",
-                "indicator": 2
-            },
-            {
-                "name": "shoulder_length",
-                "camera": 1,
-                "type": "line",
-                "points": [
-                    "left_shoulder",
-                    "right_shoulder"
-                ],
-                "indicator": 3
-            },
-            {
-                "name": "ankle_length",
-                "camera": 1,
-                "type": "line",
-                "points": [
-                    "left_ankle",
-                    "right_ankle"
-                ],
-                "indicator": 3
-            }
-        ]
-    }
+        }
+    ],
+    "sequence": [
+        {
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "max": 190
+        },
+        {
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "min": 270
+        }
+    ],
+    "plot": [
+        {
+            "name": "angle_back",
+            "type": "angle",
+            "camera": 1,
+            "points": [
+                "left_shoulder",
+                "left_hip",
+                "left_knee"
+            ],
+            "indicator": -1
+        },
+        {
+            "name": "knee",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "indicator": 0
+        },
+        {
+            "name": "thigh_centroid",
+            "camera": 0,
+            "type": "point",
+            "measurement": "thigh_centroid",
+            "indicator": 1
+        },
+        {
+            "name": "knee",
+            "camera": 0,
+            "type": "point",
+            "point": "left_ear",
+            "indicator": 2
+        },
+        {
+            "name": "shoulder_length",
+            "camera": 1,
+            "type": "line",
+            "points": [
+                "left_shoulder",
+                "right_shoulder"
+            ],
+            "indicator": 3
+        },
+        {
+            "name": "ankle_length",
+            "camera": 1,
+            "type": "line",
+            "points": [
+                "left_ankle",
+                "right_ankle"
+            ],
+            "indicator": 3
+        }
+    ]
+}
