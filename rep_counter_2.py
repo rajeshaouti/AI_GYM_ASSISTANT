@@ -35,14 +35,28 @@ direction = 0
 count = 0
 point_no = []
 
-EXERCISE_NAME = "leg_press_2.json"
-EXERCISE = os.path.join("exercises_2",EXERCISE_NAME)
-CAMERA_0 = "resize_L3_T.mov"
-CAMERA_1 = "resize_L3_S.mov"
+## TWO CAMERA TESTING
 
-# EXERCISE = "lat_pull_2.json"
-# CAMERA_0 = "resize_latpull_back.mp4"
-# CAMERA_1 = "resize_latpull_side.mp4"
+# EXERCISE_NAME = "leg_press_2.json"
+# CAMERA_0 = "resize_L3_T.mov"
+# CAMERA_1 = "resize_L3_S.mov"
+
+EXERCISE_NAME = "lat_pull_2.json"
+CAMERA_0 = "resize_latpull_back.mp4"
+CAMERA_1 = "resize_latpull_side.mp4"
+
+cameras = [CAMERA_0,CAMERA_1]
+
+EXERCISE = os.path.join("exercises_2",EXERCISE_NAME)
+
+## SINGLE CAMERA TESTINF
+
+# EXERCISE_NAME = "squats.json"
+# CAMERA_0 = "resize_L3T.mov"
+
+# cameras = [CAMERA_0]
+# EXERCISE = os.path.join("exercises_1",EXERCISE_NAME)
+
 
 landmarkID = json.loads(open("mediapipe_landmarks.json").read())
 exercise = json.loads(open(EXERCISE).read())
@@ -117,8 +131,11 @@ pose.append(PoseLandmarks())
 tracker = cv2.TrackerCSRT_create()
 
 # Capture the video feed
-cap = cv2.VideoCapture(CAMERA_0)
-cap2 = cv2.VideoCapture(CAMERA_1)
+captures = []
+for camera in cameras:
+    captures.append(cv2.VideoCapture(camera))
+# cap = cv2.VideoCapture(CAMERA_0)
+# cap2 = cv2.VideoCapture(CAMERA_1)
 
 # Run the code for plotting aruco
 _thread.start_new_thread(aigym.graph_plot, ())
@@ -155,8 +172,14 @@ if TRACK_ARUCO:
 
 data = []
 
+def captureOpened(captures):
+    opened = True
+    for capture in captures:
+        opened = opened & capture.isOpened()
+    return opened
+
 #Detecting and tracking the marker
-while cap.isOpened():
+while captureOpened(captures):
 
     #ARUCO MARKER
     if TRACK_ARUCO:
@@ -166,13 +189,19 @@ while cap.isOpened():
             pass
     
     #Updating the camera feed
-    ok1, img1 = cap.read()
-    ok2, img2 = cap2.read()
+    ok = []
+    img = []
+    for capture in captures:
+        k,im = capture.read()
+        ok.append(k)
+        img.append(im)
+    # ok1, img1 = cap.read()
+    # ok2, img2 = cap2.read()
 
-    if not (ok1 and ok2):
+    if not all(ok):
         break
 
-    img = [img1,img2]
+    # img = [img1,img2]
 
     timer = cv2.getTickCount()
 
@@ -211,17 +240,29 @@ while cap.isOpened():
 
 # Pose Dectection
 
-    imgRGB = cv2.cvtColor(img[0], cv2.COLOR_BGR2RGB)
-    imgRGB1 = cv2.cvtColor(img[1], cv2.COLOR_BGR2RGB)
-    results = [0,0]
-    t1 = threading.Thread(target=pose[0].findLandmarks, args=(results,0,imgRGB))
-    t2 = threading.Thread(target=pose[1].findLandmarks, args=(results,1,imgRGB1))
+    # imgRGB = cv2.cvtColor(img[0], cv2.COLOR_BGR2RGB)
+    # imgRGB1 = cv2.cvtColor(img[1], cv2.COLOR_BGR2RGB)
+    imgRGB = []
+    threads = []
+    results = [0 for i in range(len(captures))]
+    for i in range(len(img)):
+        imgRGB.append(cv2.cvtColor(img[i], cv2.COLOR_BGR2RGB))
+        t = threading.Thread(target=pose[i].findLandmarks, args=(results,i,imgRGB[i]))
+        threads.append(t)
 
-    t1.start()
-    t2.start()
+    # t1 = threading.Thread(target=pose[0].findLandmarks, args=(results,0,imgRGB[0]))
+    # t2 = threading.Thread(target=pose[1].findLandmarks, args=(results,1,imgRGB[1]))
 
-    t1.join()
-    t2.join()
+    for i in range(len(img)):
+        threads[i].start()
+    
+    for i in range(len(img)):
+        threads[i].join()
+    # threads[0].start()
+    # threads[1].start()
+
+    # threads[0].join()
+    # threads[1].join()
     # print(results)
     # exit()
     # results = []
@@ -229,45 +270,48 @@ while cap.isOpened():
     # results.append(pose[1].process(imgRGB1))
 
     #detecting only if pose landmarks are present
-    if results[0].pose_landmarks and results[1].pose_landmarks:
-        h, w, c = img[0].shape
-        landmark_list = [[],[]]
-
-        ind_text_start_x = 55
-        ind_text_start_y = int(h*8/10)
-        ind_box_start_x = 25
-        ind_box_start_y = int(h*8/10)-15
-
+    if all([result_pose.pose_landmarks for result_pose in results]):
+        landmark_list = [[] for i in range(len(imgRGB))]
+        h = []
+        w = []
+        c = []
         body_coordinates = [
             {"x1":inf,"y1":-inf,"x2":-inf,"y2":inf},
             {"x1":inf,"y1":-inf,"x2":-inf,"y2":inf}
         ]
 
-        #landmarks for camera 0
-        for id, lm in enumerate(results[0].pose_landmarks.landmark):
-            cx, cy = int(lm.x * w), int(lm.y * h)
-            landmark_list[0].append([id, cx, cy])
-            body_coordinates[0]["x1"] = min(cx,body_coordinates[0]["x1"])
-            body_coordinates[0]["y1"] = max(cy,body_coordinates[0]["y1"])
-            body_coordinates[0]["x2"] = max(cx,body_coordinates[0]["x2"])
-            body_coordinates[0]["y2"] = min(cy,body_coordinates[0]["y2"])
-
-        h, w, c = img[1].shape
-        #landmark for camera 1
-        for id, lm in enumerate(results[1].pose_landmarks.landmark):
-            cx, cy = int(lm.x * w), int(lm.y * h)
-            landmark_list[1].append([id, cx, cy])
-            body_coordinates[1]["x1"] = min(cx,body_coordinates[1]["x1"])
-            body_coordinates[1]["y1"] = max(cy,body_coordinates[1]["y1"])
-            body_coordinates[1]["x2"] = max(cx,body_coordinates[1]["x2"])
-            body_coordinates[1]["y2"] = min(cy,body_coordinates[1]["y2"])
+        for camera_index in range(len(imgRGB)):
+            h.append(img[camera_index].shape[0])
+            w.append(img[camera_index].shape[1])
+            c.append(img[camera_index].shape[2])
+            #landmarks for camera 0
+            for id, lm in enumerate(results[camera_index].pose_landmarks.landmark):
+                cx, cy = int(lm.x * w[camera_index]), int(lm.y * h[camera_index])
+                landmark_list[camera_index].append([id, cx, cy])
+                body_coordinates[camera_index]["x1"] = min(cx,body_coordinates[camera_index]["x1"])
+                body_coordinates[camera_index]["y1"] = max(cy,body_coordinates[camera_index]["y1"])
+                body_coordinates[camera_index]["x2"] = max(cx,body_coordinates[camera_index]["x2"])
+                body_coordinates[camera_index]["y2"] = min(cy,body_coordinates[camera_index]["y2"])
+        # ind_text_start_x = 55
+        # ind_text_start_y = 
+        # ind_box_start_x = 25
+        # ind_box_start_y = 
+        # h, w, c = img[1].shape
+        # #landmark for camera 1
+        # for id, lm in enumerate(results[1].pose_landmarks.landmark):
+        #     cx, cy = int(lm.x * w), int(lm.y * h)
+        #     landmark_list[1].append([id, cx, cy])
+        #     body_coordinates[1]["x1"] = min(cx,body_coordinates[1]["x1"])
+        #     body_coordinates[1]["y1"] = max(cy,body_coordinates[1]["y1"])
+        #     body_coordinates[1]["x2"] = max(cx,body_coordinates[1]["x2"])
+        #     body_coordinates[1]["y2"] = min(cy,body_coordinates[1]["y2"])
         
-        text_start_x = [ind_text_start_x,ind_text_start_x]
-        text_start_y = [ind_text_start_y,ind_text_start_y]
-        box_start_x = [ind_box_start_x,ind_box_start_x]
-        box_start_y = [ind_box_start_y,ind_box_start_y]
+        text_start_x = [55 for i in range(len(img))]
+        text_start_y = [int(h[i]*8/10) for i in range(len(img))]
+        box_start_x = [25 for i in range(len(img))]
+        box_start_y = [int(h[i]*8/10)-15 for i in range(len(img))]
 
-        if (len(landmark_list[0]) != 0) and (len(landmark_list[1]) != 0):
+        if all([len(landmarkList) != 0 for landmarkList in landmark_list]):
             warning = "\n"
             #PREPROCESSING MEASUREMENTS
             for measurement in exercise["measurements"]:
@@ -399,16 +443,17 @@ while cap.isOpened():
                     aigym.plot_lines_2_points(point0,point1, indicator_colors[indicator_status[plot["indicator"]]], img[plot["camera"]])
             
             #DRAWING BODY BOUNDING BOX
-            cv2.rectangle(img[0], (int(body_coordinates[0]["x1"]*0.85),int(body_coordinates[0]["y1"]*1.15)), 
-            (int(body_coordinates[0]["x2"]*1.15),int(body_coordinates[0]["y2"]*0.85)), color_green, 1, cv2.LINE_AA)
+            for camera_index in range(len(img)):
+                cv2.rectangle(img[camera_index], (int(body_coordinates[camera_index]["x1"]*0.85),int(body_coordinates[camera_index]["y1"]*1.15)), 
+                (int(body_coordinates[camera_index]["x2"]*1.15),int(body_coordinates[camera_index]["y2"]*0.85)), color_green, 1, cv2.LINE_AA)
 
-            cv2.rectangle(img[1], (int(body_coordinates[1]["x1"]*0.85),int(body_coordinates[1]["y1"]*1.15)), 
-            (int(body_coordinates[1]["x2"]*1.15),int(body_coordinates[1]["y2"]*0.85)), color_green, 1, cv2.LINE_AA)
+            # cv2.rectangle(img[1], (int(body_coordinates[1]["x1"]*0.85),int(body_coordinates[1]["y1"]*1.15)), 
+            # (int(body_coordinates[1]["x2"]*1.15),int(body_coordinates[1]["y2"]*0.85)), color_green, 1, cv2.LINE_AA)
 
 
             ## DATASET COLLECTION AND LOGGING FROM CAMERA
             pose_data = []
-            for camera_id in range(2):
+            for camera_id in range(len(img)):
                 pose_results = results[camera_id].pose_landmarks.landmark
                 # pose_data = list(np.array([[int((landmark.x) * w), int((landmark.y) * h)] for landmark in pose1]).flatten()
                 for landmark in pose_results:
@@ -446,12 +491,13 @@ while cap.isOpened():
     # ctime = time.time()
     # fps = 1 / (ctime - ptime)
     # ptime = ctime
-
-    cv2.imshow('image', img[0])
-    cv2.imshow('image2', img[1])
+    for camera_index in range(len(img)):
+        cv2.imshow('image'+str(camera_index), img[camera_index])
+        # cv2.imshow('image', img[1])
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
-cap.release()
+for capture in captures:
+    capture.release()
 cv2.destroyAllWindows()
 data = np.array(data)
 data = pd.DataFrame(data,columns = columns)
