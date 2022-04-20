@@ -181,7 +181,7 @@
                 "left_knee",
                 "left_ankle"
             ],
-            "max": 6
+            "max": 190
         },
         {
             "name": "knee_angle",
@@ -192,7 +192,7 @@
                 "left_knee",
                 "left_ankle"
             ],
-            "min": 109
+            "min": 270
         }
     ],
     "plot": [
