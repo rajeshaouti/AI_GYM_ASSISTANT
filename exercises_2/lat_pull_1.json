@@ -60,16 +60,18 @@
             "plot": true,
             "good": {
                 "min": 0,
-                "max": 35
+                "max": 35,
+                "warning": "Good Job!"
             },
             "intermediate": {
                 "min": 35,
-                "max": 55
+                "max": 55,
+                "warning": "Back angle not too bad, but try keeping it in between 110-240 degrees"
             },
             "bad": {
                 "min": 55,
                 "max": 360,
-                "warning": "Back angle too high"
+                "warning": "Back angle too low"
             }
         },
         {
@@ -78,14 +80,16 @@
             "camera": 0,
             "good": {
                 "min": "right_shoulder_angle_0.8",
-                "max": "right_shoulder_angle_1.1"
+                "max": "right_shoulder_angle_1.1",
+                "warning": "Good Job!"
             },
             "intermediate": {
                 "min": "right_shoulder_angle_0.5",
-                "max": "right_shoulder_angle_1.5"
+                "max": "right_shoulder_angle_1.5",
+                "warning": "Left and right are not completely in coordination, but not too bad."
             },
             "bad": {
-                "warning": "Left and right hard are not in coordination."
+                "warning": "Left and right hand are not in coordination."
             }
         }
     ],

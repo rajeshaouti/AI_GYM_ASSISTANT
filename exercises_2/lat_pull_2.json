@@ -82,14 +82,13 @@
                 "min": "right_shoulder_angle_0.8",
                 "max": "right_shoulder_angle_1.1",
                 "warning": "Good Job!"
-                
             },
-            "intermediate":{
+            "intermediate": {
                 "min": "right_shoulder_angle_0.5",
                 "max": "right_shoulder_angle_1.5",
                 "warning": "Left and right are not completely in coordination, but not too bad."
             },
-            "bad":{
+            "bad": {
                 "warning": "Left and right hand are not in coordination."
             }
         }

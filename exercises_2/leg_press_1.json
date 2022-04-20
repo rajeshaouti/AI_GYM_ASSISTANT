@@ -67,16 +67,18 @@
             "plot": true,
             "good": {
                 "min": 40,
-                "max": 90
+                "max": 90,
+                "warning": "Great !, good back posture"
             },
             "intermediate": {
                 "min": 30,
-                "max": 120
+                "max": 120,
+                "warning": "Acceptable , Try adjusting your back alittle."
             },
             "bad": {
                 "min": 10,
                 "max": 180,
-                "warning": "Back angle too high"
+                "warning": "Bad back posture, try adjusting your back and Legs"
             }
         },
         {
@@ -91,11 +93,13 @@
             "plot": true,
             "good": {
                 "min": 200,
-                "max": 290
+                "max": 290,
+                "warning": "Great !, good back posture"
             },
             "intermediate": {
                 "min": 190,
-                "max": 300
+                "max": 300,
+                "warning": "Acceptable ,try adjusting your knee angle "
             },
             "bad": {
                 "min": 10,
@@ -107,20 +111,30 @@
             "name": "knee_length",
             "type": "relative",
             "good": {
-                "min": "foot_length_0.8"
+                "min": "foot_length_0.8",
+                "warning": "Good Job !, maintiane this"
             },
             "intermediate": {
-                "max": "foot_length_1.3"
+                "max": "foot_length_1.3",
+                "warning": "Acceptable , Try adjusting your Knees alittle."
+            },
+            "bad": {
+                "warning": "Knees are inward, try keeping them staright"
             }
         },
         {
             "name": "foot_length",
             "type": "relative",
             "good": {
-                "min": "shoulder_length"
+                "min": "shoulder_length",
+                "warning": "Awesome !, good posture"
             },
             "intermediate": {
-                "max": "shoulder_length_1.3"
+                "max": "shoulder_length_1.3",
+                "warning": "Acceptable , Try adjusting your Feet to shouder length."
+            },
+            "bad": {
+                "warning": "Feet and Shoulders should be parallel, try adjusting you feet"
             }
         }
     ],

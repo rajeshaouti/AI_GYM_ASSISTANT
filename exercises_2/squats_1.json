@@ -81,39 +81,48 @@
             "plot": true,
             "good": {
                 "min": 0,
-                "max": 125
+                "max": 125,
+                "warning": "Good job!,keep going"
             },
             "intermediate": {
                 "min": 120,
-                "max": 135
+                "max": 135,
+                "warning": "Acceptable,allow the chest to fall forward"
             },
             "bad": {
                 "min": 135,
                 "max": 360,
-                "warning": "Back angle too high"
+                "warning": "Back angle too high,allow the chest to fall forward"
             }
         },
         {
             "name": "toe_knee_length",
             "type": "relative",
             "good": {
-                "max": "foot_length_1.1"
+                "max": "foot_length_1.1",
+                "warning": "Good job!,keep going"
             },
             "intermediate": {
-                "max": "foot_length_1.3"
+                "max": "foot_length_1.3",
+                "warning": "Acceptable, still can go low"
             },
             "bad": {
-                "warning": "Foot length too high"
+                "warning": "Foot length too high, Not going low enough "
             }
         },
         {
             "name": "ear_thighcentroid_length",
             "type": "relative",
             "good": {
-                "max": "thigh_half_length"
+                "max": "thigh_half_length",
+                "warning": "Good job!,keep going"
             },
             "intermediate": {
-                "max": "thigh_half_length_1.3"
+                "max": "thigh_half_length_1.3",
+                "warning": "Acceptable, still can go low"
+            },
+            "bad": {
+                "warning": "head thigh length too high, go low"
             }
         }
     ],
