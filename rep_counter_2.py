@@ -38,20 +38,24 @@ point_no = []
 ## TWO CAMERA TESTING
 
 # EXERCISE_NAME = "leg_press_2.json"
-# CAMERA_0 = "resize_L3_T.mov"
-# CAMERA_1 = "resize_L3_S.mov"
+# CAMERA_0 = "resize_legpress_top.mp4"
+# CAMERA_1 = "resize_legpress_side.mp4"
 
 EXERCISE_NAME = "lat_pull_2.json"
 CAMERA_0 = "resize_latpull_back.mp4"
 CAMERA_1 = "resize_latpull_side.mp4"
+
+# EXERCISE_NAME = "squats_2.json"
+# CAMERA_0 = "resize_edward1_squat_side.mp4"
+# CAMERA_1 = "edward1_squat_front.mp4"
 
 cameras = [CAMERA_0,CAMERA_1]
 
 
 ## SINGLE CAMERA TESTING
 
-# EXERCISE_NAME = "lat_pull_1.json"
-# CAMERA_0 = "resize_latpull_back.mp4"
+# EXERCISE_NAME = "leg_extension_1.json"
+# CAMERA_0 = "resize_zuoan0_legextension_side.mov"
 
 # cameras = [CAMERA_0]
 
@@ -94,15 +98,15 @@ columns.append("sequence")
 
 # mediapipe module
 pose = []
-mpDraw1 = mp.solutions.drawing_utils
-mpPose1 = mp.solutions.pose
-pose1 = mpPose1.Pose()
-pose.append(pose1)
+# mpDraw1 = mp.solutions.drawing_utils
+# mpPose1 = mp.solutions.pose
+# pose1 = mpPose1.Pose()
+# pose.append(pose1)
 
-mpDraw2 = mp.solutions.drawing_utils
-mpPose2 = mp.solutions.pose
-pose2 = mpPose2.Pose()
-pose.append(pose2)
+# mpDraw2 = mp.solutions.drawing_utils
+# mpPose2 = mp.solutions.pose
+# pose2 = mpPose2.Pose()
+# pose.append(pose2)
 
 class PoseLandmarks:
     pose = 0
@@ -123,9 +127,7 @@ def findLandmarks(pose,results,cam,imgRGB):
         except e:
             print("thread:",e)
 
-pose = []
-pose.append(PoseLandmarks())
-pose.append(PoseLandmarks())
+pose = [PoseLandmarks() for i in range(len(cameras))]
 
 # Tracking the detected marker
 tracker = cv2.TrackerCSRT_create()
