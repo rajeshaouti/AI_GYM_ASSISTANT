@@ -59,7 +59,7 @@ cameras = [CAMERA_0,CAMERA_1]
 
 # cameras = [CAMERA_0]
 
-EXERCISE = os.path.join("exercises_2",EXERCISE_NAME)
+EXERCISE = os.path.join("exercises",EXERCISE_NAME)
 
 
 landmarkID = json.loads(open("mediapipe_landmarks.json").read())
