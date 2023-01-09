@@ -1,0 +1,184 @@
+{
+    "name": "LegPress",
+    "version": "1.0",
+    "measurements": [
+        {
+            "name": "foot_length",
+            "type": "euclidean",
+            "camera": 0,
+            "points": [
+                "right_foot_index",
+                "left_foot_index"
+            ]
+        },
+        {
+            "name": "foot_length_1.1",
+            "initial": "foot_length",
+            "type": "multiply",
+            "value": 1.1
+        },
+        {
+            "name": "foot_length_1.3",
+            "initial": "foot_length",
+            "type": "multiply",
+            "value": 1.3
+        },
+        {
+            "name": "foot_length_0.8",
+            "initial": "foot_length",
+            "type": "multiply",
+            "value": 0.8
+        },
+        {
+            "name": "knee_length",
+            "type": "euclidean",
+            "camera": 0,
+            "points": [
+                "left_knee",
+                "right_knee"
+            ]
+        },
+        {
+            "name": "shoulder_length",
+            "type": "euclidean",
+            "camera": 0,
+            "points": [
+                "left_shoulder",
+                "right_shoulder"
+            ]
+        },
+        {
+            "name": "shoulder_length_1.3",
+            "initial": "shoulder_length",
+            "type": "multiply",
+            "value": 1.3
+        }
+    ],
+    "indicators": [
+        {
+            "name": "angle_back",
+            "type": "angle",
+            "camera": 1,
+            "points": [
+                "left_shoulder",
+                "left_hip",
+                "left_knee"
+            ],
+            "plot": true,
+            "good": {
+                "min": 40,
+                "max": 90,
+                "warning": "Great !, good back posture"
+            },
+            "intermediate": {
+                "min": 30,
+                "max": 120,
+                "warning": "Acceptable , Try adjusting your back alittle."
+            },
+            "bad": {
+                "min": 10,
+                "max": 180,
+                "warning": "Bad back posture, try adjusting your back and Legs"
+            }
+        },
+        {
+            "name": "knee_length",
+            "type": "relative",
+            "camera": 0,
+            "good": {
+                "min": "foot_length_0.8",
+                "warning": "Good Job !, maintiane this"
+            },
+            "intermediate": {
+                "max": "foot_length_1.3",
+                "warning": "Acceptable , Try adjusting your Knees alittle."
+            },
+            "bad": {
+                "warning": "Knees are inward, try keeping them staright"
+            }
+        },
+        {
+            "name": "foot_length",
+            "type": "relative",
+            "camera": 0,
+            "good": {
+                "min": "shoulder_length",
+                "warning": "Awesome !, good posture"
+            },
+            "intermediate": {
+                "max": "shoulder_length_1.3",
+                "warning": "Acceptable , Try adjusting your Feet to shouder length."
+            },
+            "bad": {
+                "warning": "Feet and Shoulders should be parallel, try adjusting you feet"
+            }
+        }
+    ],
+    "sequence": [
+        {
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 1,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "max": 210
+        },
+        {
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 1,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "min": 270
+        }
+    ],
+    "plot": [
+        {
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 1,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "indicator": -1
+        },
+        {
+            "name": "foot_length",
+            "type": "line",
+            "camera": 0,
+            "points": [
+                "right_foot_index",
+                "left_foot_index"
+            ],
+            "indicator": 2
+        },
+        {
+            "name": "knee_length",
+            "type": "line",
+            "camera": 0,
+            "points": [
+                "left_knee",
+                "right_knee"
+            ],
+            "indicator": 1
+        },
+        {
+            "name": "shoulder_length",
+            "type": "line",
+            "camera": 0,
+            "points": [
+                "left_shoulder",
+                "right_shoulder"
+            ],
+            "indicator": 2
+        }
+    ]
+}

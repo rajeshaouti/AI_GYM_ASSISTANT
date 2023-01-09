@@ -1,0 +1,144 @@
+{
+    "name": "lat_pull",
+    "version": "1.0",
+    "measurements": [
+        {
+            "name": "left_shoulder_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "right_shoulder",
+                "left_shoulder",
+                "left_elbow"
+            ]
+        },
+        {
+            "name": "right_shoulder_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "right_elbow",
+                "right_shoulder",
+                "left_shoulder"
+            ]
+        },
+        {
+            "name": "right_shoulder_angle_0.8",
+            "initial": "right_shoulder_angle",
+            "type": "multiply",
+            "value": 0.8
+        },
+        {
+            "name": "right_shoulder_angle_1.1",
+            "initial": "right_shoulder_angle",
+            "type": "multiply",
+            "value": 1.1
+        },
+        {
+            "name": "right_shoulder_angle_0.5",
+            "initial": "right_shoulder_angle",
+            "type": "multiply",
+            "value": 0.5
+        },
+        {
+            "name": "right_shoulder_angle_1.5",
+            "initial": "right_shoulder_angle",
+            "type": "multiply",
+            "value": 1.5
+        }
+    ],
+    "indicators": [
+        {
+            "name": "angle_back",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_shoulder",
+                "left_hip",
+                "left_knee"
+            ],
+            "plot": true,
+            "good": {
+                "min": 0,
+                "max": 35,
+                "warning": "Good Job!"
+            },
+            "intermediate": {
+                "min": 35,
+                "max": 55,
+                "warning": "Back angle not too bad, but try keeping it in between 110-240 degrees"
+            },
+            "bad": {
+                "min": 55,
+                "max": 360,
+                "warning": "Back angle too low"
+            }
+        },
+        {
+            "name": "left_shoulder_angle",
+            "type": "relative",
+            "camera": 0,
+            "good": {
+                "min": "right_shoulder_angle_0.8",
+                "max": "right_shoulder_angle_1.1",
+                "warning": "Good Job!"
+            },
+            "intermediate": {
+                "min": "right_shoulder_angle_0.5",
+                "max": "right_shoulder_angle_1.5",
+                "warning": "Left and right are not completely in coordination, but not too bad."
+            },
+            "bad": {
+                "warning": "Left and right hand are not in coordination."
+            }
+        }
+    ],
+    "sequence": [
+        {
+            "name": "right_shoulder_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "right_elbow",
+                "right_shoulder",
+                "left_shoulder"
+            ],
+            "min": 220
+        },
+        {
+            "name": "right_shoulder_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "right_elbow",
+                "right_shoulder",
+                "left_shoulder"
+            ],
+            "max": 131
+        }
+    ],
+    "plot": [
+        {
+            "name": "right_shoulder",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "right_elbow",
+                "right_shoulder",
+                "left_shoulder"
+            ],
+            "indicator": -1
+        },
+        {
+            "name": "left_shoulder",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "right_shoulder",
+                "left_shoulder",
+                "left_elbow"
+            ],
+            "indicator": 1
+        }
+    ]
+}

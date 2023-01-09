@@ -1,0 +1,84 @@
+{
+    "name": "LegPress",
+    "version": "1.0",
+    "measurements": [],
+    "indicators": [
+        {
+            "name": "angle_back",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_shoulder",
+                "left_hip",
+                "left_knee"
+            ],
+            "plot": true,
+            "good": {
+                "min": 100,
+                "max": 120,
+                "warning": "Great !, good posture"
+            },
+            "intermediate": {
+                "min": 90,
+                "max": 130,
+                "warning": "Acceptable , Try adjusting your back alittle"
+            },
+            "bad": {
+                "min": 10,
+                "max": 180,
+                "warning": "Bad posture, try adjusting your back and Legs"
+            }
+        },
+        {
+            "name": "angle_knee",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "plot": true,
+            "good": {
+                "min": 180,
+                "max": 270,
+                "warning": "Great !, good posture"
+            },
+            "intermediate": {
+                "min": 170,
+                "max": 290,
+                "warning": "Acceptable , try adjusting your knee angle"
+            },
+            "bad": {
+                "min": 10,
+                "max": 360,
+                "warning": "Bad posture, try adjusting your knee angle"
+            }
+        }
+    ],
+    "sequence": [
+        {
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "max": 205
+        },
+        {
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "min": 260
+        }
+    ],
+    "plot": []
+}

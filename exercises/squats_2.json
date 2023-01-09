@@ -1,0 +1,270 @@
+{
+    "name": "Squats",
+    "version": "1.0",
+    "measurements": [
+        {
+            "name": "foot_length",
+            "type": "euclidean",
+            "camera": 0,
+            "points": [
+                "left_ankle",
+                "left_foot_index"
+            ]
+        },
+        {
+            "name": "foot_length_1.1",
+            "initial": "foot_length",
+            "type": "multiply",
+            "value": 1.1
+        },
+        {
+            "name": "foot_length_1.3",
+            "initial": "foot_length",
+            "type": "multiply",
+            "value": 1.3
+        },
+        {
+            "name": "toe_knee_length",
+            "type": "absolute",
+            "axis": 0,
+            "camera": 0,
+            "points": [
+                "left_knee",
+                "left_foot_index"
+            ]
+        },
+        {
+            "name": "thigh_centroid",
+            "type": "centroid",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee"
+            ]
+        },
+        {
+            "name": "thigh_half_length",
+            "type": "euclidean",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "thigh_centroid"
+            ]
+        },
+        {
+            "name": "thigh_half_length_1.3",
+            "initial": "thigh_half_length",
+            "type": "multiply",
+            "value": 1.3
+        },
+        {
+            "name": "ear_thighcentroid_length",
+            "type": "absolute",
+            "camera": 0,
+            "axis": 0,
+            "points": [
+                "left_ear",
+                "thigh_centroid"
+            ]
+        },
+        {
+            "name": "shoulder_length",
+            "type": "absolute",
+            "axis": 0,
+            "camera": 1,
+            "points": [
+                "left_shoulder",
+                "right_shoulder"
+            ]
+        },
+        {
+            "name": "ankle_length",
+            "type": "absolute",
+            "camera": 1,
+            "axis": 0,
+            "points": [
+                "left_ankle",
+                "right_ankle"
+            ]
+        },
+        {
+            "name": "stance_length",
+            "type": "diff",
+            "abs": true,
+            "measurements": [
+                "ankle_length",
+                "shoulder_length"
+            ]
+        },
+        {
+            "name": "shoulder_length_0.1",
+            "initial": "shoulder_length",
+            "type": "multiply",
+            "value": 0.1
+        },
+        {
+            "name": "shoulder_length_0.3",
+            "initial": "shoulder_length",
+            "type": "multiply",
+            "value": 0.3
+        }
+    ],
+    "indicators": [
+        {
+            "name": "angle_back",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_shoulder",
+                "left_hip",
+                "left_knee"
+            ],
+            "plot": true,
+            "good": {
+                "min": 0,
+                "max": 125,
+                "warning": "Good job!,keep going"
+            },
+            "intermediate": {
+                "min": 120,
+                "max": 135,
+                "warning": "Acceptable,allow the chest to fall forward"
+            },
+            "bad": {
+                "min": 135,
+                "max": 360,
+                "warning": "Back angle too high,allow the chest to fall forward"
+            }
+        },
+        {
+            "name": "toe_knee_length",
+            "type": "relative",
+            "camera": 0,
+            "good": {
+                "max": "foot_length_1.1",
+                "warning": "Good job!,keep going"
+            },
+            "intermediate": {
+                "max": "foot_length_1.3",
+                "warning": "Acceptable, still can go low"
+            },
+            "bad": {
+                "warning": "Foot length too high, Not going low enough "
+            }
+        },
+        {
+            "name": "ear_thighcentroid_length",
+            "type": "relative",
+            "camera": 0,
+            "good": {
+                "max": "thigh_half_length",
+                "warning": "Good job!,keep going"
+            },
+            "intermediate": {
+                "max": "thigh_half_length_1.3",
+                "warning": "Acceptable, still can go low"
+            },
+            "bad": {
+                "warning": "head thigh length too high, go low"
+            }
+        },
+        {
+            "name": "stance_length",
+            "type": "relative",
+            "camera": 1,
+            "good": {
+                "max": "shoulder_length_0.1",
+                "warning": "Good job!,keep going"
+            },
+            "intermediate": {
+                "max": "shoulder_length_0.3",
+                "warning": "Acceptable, adjust you leg to sholder length"
+            },
+            "bad": {
+                "warning": " adjust you leg to sholder length.Feet and Shoulders should be parallel"
+            }
+        }
+    ],
+    "sequence": [
+        {
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "max": 190
+        },
+        {
+            "name": "knee_angle",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "min": 270
+        }
+    ],
+    "plot": [
+        {
+            "name": "angle_back",
+            "type": "angle",
+            "camera": 1,
+            "points": [
+                "left_shoulder",
+                "left_hip",
+                "left_knee"
+            ],
+            "indicator": -1
+        },
+        {
+            "name": "knee",
+            "type": "angle",
+            "camera": 0,
+            "points": [
+                "left_hip",
+                "left_knee",
+                "left_ankle"
+            ],
+            "indicator": 0
+        },
+        {
+            "name": "thigh_centroid",
+            "camera": 0,
+            "type": "point",
+            "measurement": "thigh_centroid",
+            "indicator": 1
+        },
+        {
+            "name": "knee",
+            "camera": 0,
+            "type": "point",
+            "point": "left_ear",
+            "indicator": 2
+        },
+        {
+            "name": "shoulder_length",
+            "camera": 1,
+            "type": "line",
+            "points": [
+                "left_shoulder",
+                "right_shoulder"
+            ],
+            "indicator": 3
+        },
+        {
+            "name": "ankle_length",
+            "camera": 1,
+            "type": "line",
+            "points": [
+                "left_ankle",
+                "right_ankle"
+            ],
+            "indicator": 3
+        }
+    ]
+}

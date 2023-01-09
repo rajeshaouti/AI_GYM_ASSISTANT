@@ -1,0 +1,66 @@
+
+resize_latpull_data.csv
+
+[[113   0]
+ [  1  64]]
+              precision    recall  f1-score   support
+
+         0.0       0.99      1.00      1.00       113
+         1.0       1.00      0.98      0.99        65
+
+    accuracy                           0.99       178
+   macro avg       1.00      0.99      0.99       178
+weighted avg       0.99      0.99      0.99       178
+
+
+zuoan0_legpress_data.csv
+
+[[ 95  10]
+ [  9 187]]
+              precision    recall  f1-score   support
+
+         0.0       0.91      0.90      0.91       105
+         1.0       0.95      0.95      0.95       196
+
+    accuracy                           0.94       301
+   macro avg       0.93      0.93      0.93       301
+weighted avg       0.94      0.94      0.94       301
+
+resize_mahidhar0_legextension_side_data.csv
+
+[[67 14]
+ [ 4 65]]
+              precision    recall  f1-score   support
+
+         0.0       0.94      0.83      0.88        81
+         1.0       0.82      0.94      0.88        69
+
+    accuracy                           0.88       150
+   macro avg       0.88      0.88      0.88       150
+weighted avg       0.89      0.88      0.88       150
+
+resize_edward0_squat_data.csv
+
+[[30  0]
+ [ 0 25]]
+              precision    recall  f1-score   support
+
+         0.0       1.00      1.00      1.00        30
+         1.0       1.00      1.00      1.00        25
+
+    accuracy                           1.00        55
+   macro avg       1.00      1.00      1.00        55
+weighted avg       1.00      1.00      1.00        55
+
+resize_legpress_data.csv
+
+[[50  2]
+ [ 2 70]]
+              precision    recall  f1-score   support
+
+         0.0       0.96      0.96      0.96        52
+         1.0       0.97      0.97      0.97        72
+
+    accuracy                           0.97       124
+   macro avg       0.97      0.97      0.97       124
+weighted avg       0.97      0.97      0.97       124
